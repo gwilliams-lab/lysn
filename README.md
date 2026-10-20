@@ -1,5 +1,5 @@
 
-# lysn
+# lysn: your personal annotation tool!
 
 Open-source software for speech transcription, alignment, and annotation.
 
