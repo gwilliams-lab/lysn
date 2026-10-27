@@ -1,7 +1,9 @@
 
-# lysn: your personal annotation tool!
+# lysn: your personal annotation tool
 
 Open-source software for speech transcription, alignment, and annotation.
+
+**Website:** https://gwilliams-lab.github.io/annotation-tool/
 
 A browser-based audio annotation viewer and editor for Praat TextGrid files. This repository also contains code to perform a first-pass automatic speech transcription on an audio file of your choosing.
 
