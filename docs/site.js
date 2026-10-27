@@ -45,6 +45,9 @@
     return p;
   }
 
+  if (data.demo) story.append(renderSimpleDemo(data.demo));
+  (data.demos || []).forEach((demo, demoIndex) => story.append(renderDemo(demo, demoIndex)));
+
   if (data.introTitle) {
     const h2 = document.createElement('h2');
     h2.textContent = data.introTitle;
@@ -68,8 +71,6 @@
 
   if (data.bridge) story.append(paragraph(data.bridge.html, data.bridge.id));
 
-  if (data.demo) story.append(renderSimpleDemo(data.demo));
-  (data.demos || []).forEach((demo, demoIndex) => story.append(renderDemo(demo, demoIndex)));
   if (data.features) story.append(renderFeatures(data.features));
 
   (data.sections || []).forEach((section) => {
@@ -255,7 +256,7 @@
       button.id = 'demo-' + demoIndex + '-tab-' + i;
       button.setAttribute('role', 'tab');
       button.setAttribute('aria-controls', panel.id);
-      button.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+      button.setAttribute('aria-selected', 'false');
       button.textContent = tab.title;
       button.addEventListener('click', () => select(i));
       button.addEventListener('keydown', (event) => {
@@ -282,7 +283,8 @@
       if (embed) embedSlot.append(embed);
     }
 
-    select(0);
+    const initial = Math.min(Math.max(demo.defaultTab || 0, 0), demo.tabs.length - 1);
+    select(initial);
 
     const caption = document.createElement('figcaption');
     caption.textContent = demo.caption;

@@ -31,6 +31,41 @@ window.LYSN = {
     'Project introduction',
   ],
 
+  demos: [
+    {
+      label: 'From recording to annotations',
+      badge: '',
+      caption: 'Embedded demo: follow a short recording through annotation, correction, and export.',
+      defaultTab: 1,
+      tabs: [
+        {
+          title: '01 · Generate',
+          heading: 'Start with a recording',
+          copy: 'Automatic transcription and alignment on a short audio clip.',
+          input: 'Audio clip',
+          output: 'Initial annotations',
+          embed: { type: 'image', src: 'assets/demos/Generate.gif', alt: 'Generating annotations from a recording' },
+        },
+        {
+          title: '02 · Correct',
+          heading: 'Inspect, adjust, and revisit',
+          copy: 'An annotation being corrected, then revisited through the iterative workflow.',
+          input: 'Initial annotations',
+          output: 'Reviewed annotations',
+          embed: { type: 'image', src: 'assets/demos/Correct.gif', alt: 'Correcting an annotation in lysn' },
+        },
+        {
+          title: '03 · Export',
+          heading: 'Return to your research',
+          copy: 'Corrected annotations exported in Praat TextGrid format.',
+          input: 'Reviewed annotations',
+          output: 'TextGrid',
+          embed: { type: 'image', src: 'assets/demos/Save.gif', alt: 'Saving annotations as a TextGrid' },
+        },
+      ],
+    },
+  ],
+
   introTitle: 'Motivations',
   intro: [
     {
@@ -60,40 +95,6 @@ window.LYSN = {
   bridge: {
     html: 'Automatic annotations require inspection and, often, manual correction. The extent to which manual correction is required depends on audio background noise, recording quality, as well as features of the speech content (e.g. clarity in speaker pronunciation, overlapping speech) (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12435784/#bib148" target="_blank" rel="noopener">Agmon, et. al, 2025</a>). The process of speech annotating is iterative: correcting word transcripts may require rerunning alignment, followed by further inspection and adjustment. Moving between separate tools and custom scripts makes that cycle slow and tedious. <code>lysn</code> brings these steps into one workflow so researchers can move more easily between automatic processing and manual correction.',
   },
-
-  demos: [
-    {
-      label: 'From recording to annotations',
-      badge: '',
-      caption: 'Embedded demo: follow a short recording through annotation, correction, and export.',
-      tabs: [
-        {
-          title: '01 · Generate',
-          heading: 'Start with a recording',
-          copy: 'Automatic transcription and alignment on a short audio clip.',
-          input: 'Audio clip',
-          output: 'Initial annotations',
-          embed: { type: 'image', src: 'assets/demos/Generate.gif', alt: 'Generating annotations from a recording' },
-        },
-        {
-          title: '02 · Correct',
-          heading: 'Inspect, adjust, and revisit',
-          copy: 'An annotation being corrected, then revisited through the iterative workflow.',
-          input: 'Initial annotations',
-          output: 'Reviewed annotations',
-          embed: { type: 'image', src: 'assets/demos/Correct.gif', alt: 'Correcting an annotation in lysn' },
-        },
-        {
-          title: '03 · Export',
-          heading: 'Return to your research',
-          copy: 'Corrected annotations exported in Praat TextGrid format.',
-          input: 'Reviewed annotations',
-          output: 'TextGrid',
-          embed: { type: 'image', src: 'assets/demos/Save.gif', alt: 'Saving annotations as a TextGrid' },
-        },
-      ],
-    },
-  ],
 
   features: {
     title: 'Features',

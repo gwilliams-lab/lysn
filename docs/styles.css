@@ -147,7 +147,7 @@ button { font: 13px system-ui, sans-serif; cursor: pointer; }
 .demo-body { padding: 25px 25px 30px; }
 .demo-body h3 { font: 600 17px system-ui, sans-serif; margin: 0 0 10px; }
 .demo-body p { font: 15px/1.65 system-ui, sans-serif; margin: 0; color: var(--muted); }
-.embed { max-width: 640px; margin: 18px auto 0; border-radius: 8px; overflow: hidden; background: #000; }
+.embed { max-width: 860px; margin: 18px auto 0; border-radius: 8px; overflow: hidden; background: #000; }
 .embed iframe,
 .embed video { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; object-fit: cover; }
 .embed img { display: block; width: 100%; height: auto; border: 0; }
