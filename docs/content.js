@@ -97,7 +97,7 @@ window.LYSN = {
 
   features: {
     title: 'Features',
-    html: 'We are excited about the following features! They are designed to help you annotate speech data in a way that is efficient and accurate.',
+    html: 'There are a couple of key features in <code>lysn</code> that we are particularly excited about. Take a look at the embedded demos below to see them in action!',
     items: [
       {
         title: 'Integrated MFA alignment',

@@ -119,6 +119,7 @@
       h2.textContent = features.title;
       wrap.append(h2);
     }
+    if (features.html) wrap.append(paragraph(features.html));
     (features.items || []).forEach((item) => {
       const figure = document.createElement('figure');
       figure.className = 'demo';
