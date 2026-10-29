@@ -9,8 +9,8 @@
 <h1 align="center">lysn</h1>
 
 <p align="center">
-  Open-source software for speech transcription, alignment, and annotation.<br>
-  A browser-based viewer and editor for Praat TextGrid files, plus a first-pass ASR pipeline.
+  Open-source platform for generating, inspecting, and correcting speech annotations. <br>
+  Automatic transcription alongside a browser-based editor for annotations in standard TextGrid formats.
 </p>
 
 <p align="center">
@@ -34,7 +34,7 @@ The documentation is split across several files:
 
 - **This README** — setup and overview for lysn
 - **[TRANSCRIPTION.md](TRANSCRIPTION.md)** — generating an initial TextGrid from audio
-- **[USAGE.md](USAGE.md)** — a guide to running lysn
+- **[USAGE.md](USAGE.md)** — a guide to running the browser-based annotation editor
 - **[ADVANCED.md](ADVANCED.md)** — advanced audio features
 
 ## Setup
