@@ -24,7 +24,7 @@ _CHECKPOINT = "tiny.en"   # change to e.g. "base.en", "small.en", "large-v3-turb
 
 Larger models are more accurate but slower. See the [WhisperX docs](https://github.com/m-bain/whisperX) for all available checkpoints.
 
-<video src="https://github.com/user-attachments/assets/1f9cb5c7-2829-4bd2-9c47-d2ca2fb4b183" controls width="100%"></video>
+<!-- <video src="https://github.com/user-attachments/assets/1f9cb5c7-2829-4bd2-9c47-d2ca2fb4b183" controls width="100%"></video> -->
 
 ---
 
