@@ -10,7 +10,7 @@
 
 <p align="center">
   Open-source platform for generating, inspecting, and correcting speech annotations. <br>
-  Automatic transcription alongside a browser-based editor for annotations in standard TextGrid formats.
+  Combines automatic transcription with a browser-based editor for TextGrid annotations.
 </p>
 
 <p align="center">
@@ -24,18 +24,30 @@
 
 ## About
 
- lysn is a browser-based audio annotation viewer and editor for Praat TextGrid files. This repository also contains code to perform a first-pass automatic speech transcription on an audio file of your choosing.
-
 There are two main components in this repository:
   - **Automatic Audio Transcription** (`asr/`) — transcribe words and phonemes from audio to generate an initial TextGrid
   - **View and Edit Annotation** (`frontend-reactjs/`) — review, correct, and export the annotations from an existing TextGrid
 
 The documentation is split across several files:
 
-- **This README** — setup and overview for lysn
+- **This README** — demo and setup for lysn
 - **[TRANSCRIPTION.md](TRANSCRIPTION.md)** — generating an initial TextGrid from audio
 - **[USAGE.md](USAGE.md)** — a guide to running the browser-based annotation editor
 - **[ADVANCED.md](ADVANCED.md)** — advanced audio features
+
+---
+
+## Demo
+What you should see once the tool is all set up:
+
+> [!NOTE]
+> The interface may look slightly different from this demo, but the functionality is the same; don't worry if your version doesn't match exactly.
+
+<a href="https://www.youtube.com/watch?v=itkZ2tmGEx8">
+  <img src="https://img.youtube.com/vi/itkZ2tmGEx8/maxresdefault.jpg" width="600">
+</a>
+
+---
 
 ## Setup
 
@@ -118,16 +130,6 @@ Windows isn't supported directly since `setup.sh` is a bash script — use WSL (
 
 lysn is designed to run **locally in development mode** (`npm run dev`). A static production bundle (`npm run build` → `dist/`) will load and run, but will not enable you to: enhance the spectrogram and formants, save an edited textgrid to disk, load a `.wav` from outside `public/`, or perform in-browser MFA re-alignment. tldr; keep using `npm run dev` for the full experience. 
 
----
-
-## Demo
-What you should see once the tool is all set up:
-
-Note: The interface may look slightly different from this demo, but the functionality is the same; don't worry if your version doesn't match exactly.
-
-<a href="https://www.youtube.com/watch?v=itkZ2tmGEx8">
-  <img src="https://img.youtube.com/vi/itkZ2tmGEx8/maxresdefault.jpg" width="600">
-</a>
 
 <!-- <video src="https://www.youtube.com/embed/itkZ2tmGEx8" controls width="100%"></video>
 <!-- <video src="https://github.com/user-attachments/assets/a6242a2a-df1b-4089-88d7-ecdb3a090055" controls width="100%"></video> --> -->
