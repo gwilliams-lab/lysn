@@ -4,6 +4,11 @@ Generate an initial TextGrid from audio that contains automatic word and phoneme
 
 [← Back to README](README.md) · [Usage →](USAGE.md) · [Advanced features →](ADVANCED.md)
 
+- [Running automatic transcription](#automatic-transcription)
+- [Non-English audio](#non-english-audio)
+- [Constraining phonemes to word boundaries](#constraining-phonemes-to-word-boundaries)
+- [Using a reference transcript](#using-a-reference-transcript)
+
 --- 
 To perform automatic transcription on your own audio file, run from the `annotation-tool/` directory:
 

@@ -4,6 +4,13 @@ Advanced lysn features: spectrogram, formants & pitch, confidence scores, custom
 
 [← Back to README](README.md) · [Transcription →](TRANSCRIPTION.md) · [Usage →](USAGE.md)
 
+- [Spectrogram & formants](#spectrogram--formants)
+- [Confidence scores](#confidence-scores)
+- [Customizing the IPA keyboard](#customizing-the-ipa-keyboard)
+- [In-browser MFA re-alignment](#in-browser-mfa-re-alignment)
+
+---
+
 ## Spectrogram & formants
 
 The spectrogram auto-renders at high resolution as you scroll/zoom — there are currently no manual tuning settings (no mel-bands/FFT-size dropdown); window size, FFT size, and dB range are fixed.

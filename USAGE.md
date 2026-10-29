@@ -4,6 +4,10 @@ How to run lysn and work efficiently while annotating.
 
 [← Back to README](README.md) · [Transcription →](TRANSCRIPTION.md) · [Advanced features →](ADVANCED.md)
 
+- [Running lysn](#running-lysn)
+- [Tips and Tricks for Annotating](#tips-and-tricks-for-annotating)
+- [Keyboard shortcuts — quick reference](#keyboard-shortcuts--quick-reference)
+
 ---
 
 Copy your audio and TextGrid into the frontend's `public/` folder:
