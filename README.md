@@ -1,37 +1,43 @@
 
-# lysn: your personal annotation tool!
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="frontend-reactjs/public/icons/lysn_dark-mode.png">
+    <a href="https://gwilliams-lab.github.io/lysn/"> <img src="frontend-reactjs/public/icons/lysn_light-mode.png" alt="lysn logo" width="140"> </a>
+  </picture>
+</p>
 
-Open-source software for speech transcription, alignment, and annotation.
+<h1 align="center">lysn</h1>
 
-A browser-based audio annotation viewer and editor for Praat TextGrid files. This repository also contains code to perform a first-pass automatic speech transcription on an audio file of your choosing.
+<p align="center">
+  Open-source software for speech transcription, alignment, and annotation.<br>
+  A browser-based viewer and editor for Praat TextGrid files, plus a first-pass ASR pipeline.
+</p>
+
+<p align="center">
+  <a href="https://gwilliams-lab.github.io/lysn/">Website</a> ·
+  <a href="#about">About</a> ·
+  <a href="#initial-setup">Setup</a> ·
+  <a href="TRANSCRIPTION.md">Transcription</a> ·
+  <a href="USAGE.md">Usage</a> ·
+  <a href="ADVANCED.md">Advanced</a> ·
+</p>
+
+## About
+
+ lysn is a browser-based audio annotation viewer and editor for Praat TextGrid files. This repository also contains code to perform a first-pass automatic speech transcription on an audio file of your choosing.
 
 There are two main components in this repository:
   - **Automatic Audio Transcription** (`asr/`) — transcribe words and phonemes from audio to generate an initial TextGrid
   - **View and Edit Annotation** (`frontend-reactjs/`) — review, correct, and export the annotations from an existing TextGrid
 
-## Documentation
+The documentation is split across several files:
 
-The documentation is split across four files:
+- **This README** — setup and overview for lysn
+- **[TRANSCRIPTION.md](TRANSCRIPTION.md)** — generating an initial TextGrid from audio
+- **[USAGE.md](USAGE.md)** — a guide to running lysn
+- **[ADVANCED.md](ADVANCED.md)** — advanced audio features
 
-**This README** — setup and overview for lysn
-- [Initial Setup](#initial-setup)
-- [Demo](#demo)
-- [File Structure](#file-structure)
-
-**[TRANSCRIPTION.md](TRANSCRIPTION.md)** — generating an initial TextGrid from audio
-- [Audio Transcription](TRANSCRIPTION.md#audio-transcription)
-
-**[USAGE.md](USAGE.md)** — a guide to running lysn
-- [Running lysn](USAGE.md#running-lysn)
-- [Tips and Tricks for Annotating](USAGE.md#tips-and-tricks-for-annotating)
-- [Keyboard shortcuts — quick reference](USAGE.md#keyboard-shortcuts--quick-reference)
-
-**[ADVANCED.md](ADVANCED.md)** — advanced audio features
-- [Spectrogram & formants](ADVANCED.md#spectrogram--formants)
-- [Confidence scores](ADVANCED.md#confidence-scores)
-- [In-browser MFA re-alignment](ADVANCED.md#in-browser-mfa-re-alignment)
-
-## Initial Setup
+## Setup
 
 **Pick your platform first** — the steps are considerably different depending on platform:
 - **macOS or Linux** → [macOS / Linux setup](#macos--linux-setup)
@@ -52,9 +58,9 @@ Requirements:
   nvm install 20 && nvm use 20
   ```
 
-Note: There is no audio in the following video.
+<!-- Note: There is no audio in the following video.
 
-https://github.com/user-attachments/assets/cd1a1024-f75e-4e82-831d-2d5e86317f5b
+https://github.com/user-attachments/assets/cd1a1024-f75e-4e82-831d-2d5e86317f5b -->
 
 Setup:
 - From the `annotation-tool/` directory, run:
@@ -68,7 +74,7 @@ This creates the necessary conda environments (`aligner`, `whisperx`, and `nemo`
 - `nemo` (Parakeet) is currently only supported on Linux with NVIDIA GPUs and will be skipped on macOS.
 - WhisperX on Mac will use CPU or MPS (Apple Silicon) for inference.
 
-https://github.com/user-attachments/assets/62ee126e-0700-4531-a4b4-1b1440d276ed
+<!-- https://github.com/user-attachments/assets/62ee126e-0700-4531-a4b4-1b1440d276ed -->
 
 Once setup finishes:
 ```bash
@@ -117,6 +123,8 @@ lysn is designed to run **locally in development mode** (`npm run dev`). A stati
 ## Demo
 What you should see once the tool is all set up:
 
+Note: The interface may look slightly different from this demo, but the functionality is the same; don't worry if your version doesn't match exactly.
+
 <a href="https://www.youtube.com/watch?v=itkZ2tmGEx8">
   <img src="https://img.youtube.com/vi/itkZ2tmGEx8/maxresdefault.jpg" width="600">
 </a>
@@ -126,7 +134,7 @@ What you should see once the tool is all set up:
 
 ---
 
-## File structure
+<!-- ## File structure
 
 ```
 annotation-tool/
@@ -157,13 +165,13 @@ annotation-tool/
     ├── vite.config.js        — Vite config + dev-server middleware (/api/public-files, /api/compute-dsp, /api/save-textgrid)
     ├── public/               — place your .wav and .TextGrid here (also ipa_keys.json, the virtual IPA keyboard's key set)
     └── src/
-        ├── App.jsx           — main application: state, canvas drawing, interaction
-        ├── parseTextGrid.js  — Praat TextGrid parser + serializer
+        ├── App.jsx           — main application: state, canvas drawing, interaction, TextGrid serializer
+        ├── parseTextGrid.js  — Praat TextGrid parser
         ├── dsp.js            — DSP helpers used on the main thread (mel spectrogram, LPC formants, colormaps)
         ├── specWorker.js     — Web Worker: base mel spectrogram computed once on load
         ├── mfaWorker.js      — Web Worker: encodes audio + talks to mfa_server.py for in-browser re-alignment
         ├── canvasUtils.js    — canvas HiDPI setup + time formatting
         ├── shortcuts.js      — content for the in-app keyboard-shortcuts / tile-colors popover
         └── index.css         — all styles
-```
+``` -->
 

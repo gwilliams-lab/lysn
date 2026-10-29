@@ -4,6 +4,11 @@ Generate an initial TextGrid from audio that contains automatic word and phoneme
 
 [← Back to README](README.md) · [Usage →](USAGE.md) · [Advanced features →](ADVANCED.md)
 
+- [Running automatic transcription](#automatic-transcription)
+- [Non-English audio](#non-english-audio)
+- [Constraining phonemes to word boundaries](#constraining-phonemes-to-word-boundaries)
+- [Using a reference transcript](#using-a-reference-transcript)
+
 --- 
 To perform automatic transcription on your own audio file, run from the `annotation-tool/` directory:
 
@@ -13,7 +18,7 @@ bash asr/run_whisper.sh /path/to/your/audio.wav output_filename # output_filenam
 
 This handles everything — word and phoneme transcription and alignment. 
 
-If you specify an output file name, the resulting TextGrid will be saved to `frontend-reactjs/public/[output_filename].TextGrid` otherwise the default filename is `output_whisper.TextGrid`.
+If you specify an output file name, the resulting TextGrid will be saved to `frontend-reactjs/public/[output_filename].TextGrid`, otherwise the default filename is `output_whisper.TextGrid`.
 
 --- 
 **Changing the Whisper model size** — by default WhisperX uses `tiny.en` (fast, less accurate). To use a larger model, edit line 32 of `asr/models/whisper_asr.py`:
@@ -24,7 +29,7 @@ _CHECKPOINT = "tiny.en"   # change to e.g. "base.en", "small.en", "large-v3-turb
 
 Larger models are more accurate but slower. See the [WhisperX docs](https://github.com/m-bain/whisperX) for all available checkpoints.
 
-<video src="https://github.com/user-attachments/assets/1f9cb5c7-2829-4bd2-9c47-d2ca2fb4b183" controls width="100%"></video>
+<!-- <video src="https://github.com/user-attachments/assets/1f9cb5c7-2829-4bd2-9c47-d2ca2fb4b183" controls width="100%"></video> -->
 
 ---
 
@@ -56,7 +61,7 @@ MFA phoneme alignment defaults to English (`english_us_arpa`) though, so alignin
        --acoustic-model french_mfa
    ```
 
-See [asr/README.md](asr/README.md#all-flags) for the full flag reference. Phoneme labels for non-English models are shown as MFA's own phone symbols as-is — the ARPAbet→IPA lookup only covers English ARPAbet phones and passes anything else through unchanged.
+See [asr/README.md](asr/README.md#all-flags) for the full flag reference. Phoneme labels for non-English models are shown as MFA's own phone symbols as-is. The ARPAbet→IPA lookup only covers English ARPAbet phones and passes anything else through unchanged.
 
 For non-English **in-browser** MFA re-alignment (the MFA button while annotating), see [Advanced features → In-browser MFA re-alignment](ADVANCED.md#in-browser-mfa-re-alignment).
 
@@ -74,7 +79,7 @@ conda run -n aligner python asr/transcribe.py \
     --word-level-mfa
 ```
 
-Off by default — whole-segment alignment gives MFA more acoustic context and is the higher-quality default; word-level trades some of that context for a hard per-word boundary guarantee. That guarantee isn't absolute either: for the minority of words where Whisper's own timestamp disagrees with MFA's by more than the word is long (mostly short function words like "a"/"the"/"is"), the word falls back to the same unclamped behavior as the default instead of being silently dropped. See [asr/README.md](asr/README.md#all-flags) for the full flag reference.
+Off by default — whole-segment alignment gives MFA more acoustic context and is higher-quality default; word-level trades some of that context for a hard per-word boundary guarantee. However, for the minority of words where Whisper's own timestamp disagrees with MFA's by more than the word is long (mostly short function words like "a"/"the"/"is"), the word will fall back to the same unclamped behavior as the default. See [asr/README.md](asr/README.md#all-flags) for the full flag reference.
 
 ---
 

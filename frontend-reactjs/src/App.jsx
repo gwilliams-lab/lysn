@@ -312,7 +312,7 @@ function IpaTooltip({ symbol, example, anchorRect }) {
   );
 }
 
-function LabelEditorPopover({ editor, onCommit, onClose }) {
+function LabelEditorPopover({ editor, onCommit, onClose, inputElRef }) {
   const inputRef = React.useRef(null);
   const wrapRef  = React.useRef(null);
   const isPhone  = editor.tierType === 'phone';
@@ -334,7 +334,7 @@ function LabelEditorPopover({ editor, onCommit, onClose }) {
     <div ref={wrapRef} style={{ position: 'fixed', left, top, zIndex: 5000 }}>
       <input
         autoFocus
-        ref={inputRef}
+        ref={(el) => { inputRef.current = el; if (inputElRef) inputElRef.current = el; }}
         defaultValue={editor.text}
         style={{
           width: editor.boxW,
@@ -343,15 +343,17 @@ function LabelEditorPopover({ editor, onCommit, onClose }) {
           padding: '3px 6px', fontSize: 13, fontFamily: 'Inter,sans-serif',
           outline: 'none', textAlign: 'center',
         }}
+        onFocus={(e) => e.target.select()}
         onKeyDown={(e) => {
-          if (e.key === 'Enter') onCommit(e.target.value);
+          if (e.key === 'Enter') onCommit(editor, e.target.value);
           if (e.key === 'Escape') onClose();
         }}
         onBlur={(e) => {
           // delay so IPA key clicks register before blur fires
+          const value = e.target.value;
           setTimeout(() => {
             if (document.activeElement !== inputRef.current)
-              onCommit(e.target.value);
+              onCommit(editor, value);
           }, 150);
         }}
       />
@@ -1244,6 +1246,8 @@ export default function App() {
   const [specCrosshair, setSpecCrosshair] = useState(null); // { y, hz } | null — live frequency readout under the mouse
   const [editMode, setEditMode]         = useState(true);
   const [labelEditor, setLabelEditor]   = useState(null); // { id, tierId, tierType, text, x, y, boxW }
+  const labelEditorRef  = useRef(null);  // mirror of labelEditor, readable from native canvas handlers
+  const labelInputElRef = useRef(null);  // the live <input> element of the open editor
   const [showDashboard, setShowDashboard] = useState(false);
   const [showShortcutsPopover, setShowShortcutsPopover] = useState(false);
   // Chrome-only theme (toolbar/panels/popovers). A small set of draw* colors also read
@@ -3250,7 +3254,7 @@ export default function App() {
           const x0 = tX(newItem.t0, rect.width) + rect.left;
           const x1 = tX(newItem.t1, rect.width) + rect.left;
           const tierType = getTierType(tierId);
-          setLabelEditor({ id: newItem.id, tierId, tierType, text: '', x: (x0 + x1) / 2, y: e.clientY, boxW: Math.max(80, x1 - x0) });
+          openLabelEditor({ id: newItem.id, tierId, tierType, text: '', x: (x0 + x1) / 2, y: e.clientY, boxW: Math.max(80, x1 - x0) });
           redraw();
           return;
         }
@@ -3375,7 +3379,7 @@ export default function App() {
       if (e.detail === 2) {
         const x0 = tX(item.t0, rect.width) + rect.left;
         const x1 = tX(item.t1, rect.width) + rect.left;
-        setLabelEditor({ id: item.id, tierId, tierType: getTierType(tierId), text: item.text, x: (x0 + x1) / 2, y: e.clientY, boxW: Math.max(80, x1 - x0) });
+        openLabelEditor({ id: item.id, tierId, tierType: getTierType(tierId), text: item.text, x: (x0 + x1) / 2, y: e.clientY, boxW: Math.max(80, x1 - x0) });
         return;
       }
 
@@ -3776,7 +3780,7 @@ export default function App() {
         const rect = canvas.getBoundingClientRect();
         const x0 = tX(item.t0, rect.width) + rect.left;
         const x1 = tX(item.t1, rect.width) + rect.left;
-        setLabelEditor({ id: item.id, tierId, tierType: getTierType(tierId), text: item.text, x: (x0 + x1) / 2, y: e.clientY, boxW: Math.max(80, x1 - x0) });
+        openLabelEditor({ id: item.id, tierId, tierType: getTierType(tierId), text: item.text, x: (x0 + x1) / 2, y: e.clientY, boxW: Math.max(80, x1 - x0) });
       });
 
       menuItem('Merge with next', () => {
@@ -3945,20 +3949,46 @@ export default function App() {
   };
 
   // ── Label editor commit ───────────────────────────────────────────────
-  const commitLabel = useCallback((newText) => {
-    const ed = labelEditor;
+  // Keep a ref mirror so native (non-React) canvas handlers can see the currently
+  // open editor without a stale closure.
+  useEffect(() => { labelEditorRef.current = labelEditor; }, [labelEditor]);
+
+  // Write a label onto a specific tile — no UI side effects. Shared by the normal
+  // commit path and by openLabelEditor's "auto-commit the previous editor" path.
+  const applyLabel = useCallback((ed, newText) => {
     if (!ed) return;
     const src = ed.tierId === 'words' ? wordsRef.current
               : ed.tierId === 'phones' ? phonesRef.current
               : (customTiersRef.current.find(t => t.id === ed.tierId)?.items ?? []);
     const current = src.find(it => it.id === ed.id);
+    if (!current) return;
     // Only record an undo snapshot if the text actually changed
-    if (current && current.text !== newText) pushUndo();
+    if (current.text !== newText) pushUndo();
     const updated = src.map(it => it.id === ed.id ? { ...it, text: newText } : it);
     commitTierItems(ed.tierId, updated);
-    setLabelEditor(null);
+  }, [commitTierItems, pushUndo]);
+
+  // Called from the editor's Enter / blur. `ed` is captured by the popover at render
+  // time (not read from current state), so a blur that fires *after* the user already
+  // opened a different tile's editor still commits to the right tile — and only closes
+  // the editor if the one being committed is still the open one.
+  const commitLabel = useCallback((ed, newText) => {
+    applyLabel(ed, newText);
+    setLabelEditor(cur => (cur && cur.id === ed.id && cur.tierId === ed.tierId) ? null : cur);
     redraw();
-  }, [labelEditor, commitTierItems, redraw, pushUndo]);
+  }, [applyLabel, redraw]);
+
+  // Open the inline label editor for a tile. If an editor is already open on a
+  // *different* tile, commit it first (using its live input text) — so double-clicking
+  // another tile behaves like pressing Enter on the current one, instead of leaking
+  // the previous tile's text onto the new one.
+  const openLabelEditor = useCallback((ed) => {
+    const prev = labelEditorRef.current;
+    if (prev && (prev.id !== ed.id || prev.tierId !== ed.tierId) && labelInputElRef.current) {
+      applyLabel(prev, labelInputElRef.current.value);
+    }
+    setLabelEditor(ed);
+  }, [applyLabel]);
   // ── MFA alignment ─────────────────────────────────────────────────────────
 
   /**
@@ -4069,7 +4099,7 @@ export default function App() {
         const hResp = await fetch(`${MFA_SERVER}/health`, { signal: AbortSignal.timeout(3000) });
         serverOk = hResp.ok;
       } catch(_) {}
-      if (!serverOk) throw new Error(`MFA server not reachable at ${MFA_SERVER}\nRun: cd code && python mfa_server.py`);
+      if (!serverOk) throw new Error(`MFA server not reachable at ${MFA_SERVER}\nRun (in the aligner conda env, from the repo root): python mfa_server.py`);
 
       const result = await new Promise((resolve, reject) => {
         const worker = new Worker(new URL('./mfaWorker.js', import.meta.url), { type: 'module' });
@@ -4371,9 +4401,11 @@ export default function App() {
       {/* Floating label editor input */}
       {labelEditor && (
         <LabelEditorPopover
+          key={`${labelEditor.tierId}:${labelEditor.id}`}
           editor={labelEditor}
           onCommit={commitLabel}
           onClose={() => setLabelEditor(null)}
+          inputElRef={labelInputElRef}
         />
       )}
 

@@ -1,22 +1,29 @@
 # Advanced Features
 
-Advanced lysn features: spectrogram, formants & pitch, confidence scores, and in-browser MFA re-alignment.
+Advanced lysn features: spectrogram, formants & pitch, confidence scores, customizing the IPA keyboard, and in-browser MFA re-alignment.
 
 [← Back to README](README.md) · [Transcription →](TRANSCRIPTION.md) · [Usage →](USAGE.md)
 
+- [Spectrogram & formants](#spectrogram--formants)
+- [Confidence scores](#confidence-scores)
+- [Customizing the IPA keyboard](#customizing-the-ipa-keyboard)
+- [In-browser MFA re-alignment](#in-browser-mfa-re-alignment)
+
+---
+
 ## Spectrogram & formants
 
-The spectrogram auto-renders at high resolution as you scroll/zoom — there are no manual tuning settings (no mel-bands/FFT-size dropdown); window size, FFT size, and dB range are fixed to match Audacity's own Spectrogram Settings defaults.
+The spectrogram auto-renders at high resolution as you scroll/zoom — there are currently no manual tuning settings (no mel-bands/FFT-size dropdown); window size, FFT size, and dB range are fixed.
 
 - **Hover** — a dashed crosshair line follows your cursor with a live frequency readout (e.g. `342 Hz` / `3.42 kHz`), lining up with the fixed axis tick labels (100 Hz–8 kHz) shown to the left of the panel.
 - **Right-click** — opens a menu with:
   - **Spectrogram settings** — "↻ Force Refresh" (forces an immediate recompute of the current view instead of waiting for the automatic background refresh) and "⟳ Regenerate formants & pitch" (recomputes F1/F2/F3/F0 for the current view and shows all four tracks)
   - **Colormap** — Jet, Inferno, Viridis, or Greys
 
-A small strip in the top-right corner of the spectrogram is always visible, with four independent checkboxes — **F0**, **F1**, **F2**, **F3** — to show or hide each track without opening the menu. Checking a box always recomputes for the current view first, so panning or zooming since the last generate won't leave you looking at a stale track — you don't need to manually "Regenerate" just to refresh a checkbox.
+A small strip in the top-right corner of the spectrogram is always visible, with four independent checkboxes — **F0**, **F1**, **F2**, **F3** — to show or hide each track without opening the menu. Checking a box should always recompute the acoustic feature for the current view.
 
 - **F1/F2/F3** — Praat-style scatter dots (not a connected line), one per analysis frame, computed by Praat's Burg algorithm (via `parselmouth`) with a 5500 Hz ceiling.
-- **F0 (pitch)** — a connected gold line (Praat's autocorrelation "To Pitch" method), broken into separate segments at unvoiced frames rather than bridging silences with a straight line.
+- **F0 (pitch)** — a connected gold line (Praat's autocorrelation "To Pitch" method), with no computed values at unvoiced frames.
 
 > **Note:** Force Refresh and Regenerate formants & pitch require the `aligner` conda environment (created by `setup.sh`) and the Vite dev server (`npm run dev`) — they are not available in production builds. The frequency crosshair works everywhere, including production builds, since it's computed entirely in the browser with no server round-trip.
 
@@ -38,6 +45,24 @@ Click **Scores** in the toolbar to open the Confidence Dashboard, which shows:
 - 10-bin histogram
 - Color legend
 - 5 lowest-confidence words — click any of them to jump the playhead and view to it
+
+---
+
+## Customizing the IPA keyboard
+
+When you rename a phoneme tile, an IPA virtual keyboard appears. Its symbols are read from `frontend-reactjs/public/ipa_keys.json` — edit that file to add, remove, or change the available IPA symbols.
+
+Each entry maps an IPA symbol to an example word, with `**bold**` marking the part of the word that makes the sound (shown in the key's hover tooltip):
+
+```json
+{
+  "ʃ": "**sh**ip",
+  "tʃ": "**ch**oke",
+  "oʊ": "b**oa**t"
+}
+```
+
+The file loads on startup, so changes take effect on the next page reload.
 
 ---
 
