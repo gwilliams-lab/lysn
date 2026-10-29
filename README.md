@@ -30,6 +30,8 @@ There are two main components in this repository:
   - **Automatic Audio Transcription** (`asr/`) — transcribe words and phonemes from audio to generate an initial TextGrid
   - **View and Edit Annotation** (`frontend-reactjs/`) — review, correct, and export the annotations from an existing TextGrid
 
+The documentation is split across several files:
+
 - **This README** — setup and overview for lysn
 - **[TRANSCRIPTION.md](TRANSCRIPTION.md)** — generating an initial TextGrid from audio
 - **[USAGE.md](USAGE.md)** — a guide to running lysn
