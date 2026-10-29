@@ -159,8 +159,8 @@ annotation-tool/
     ├── vite.config.js        — Vite config + dev-server middleware (/api/public-files, /api/compute-dsp, /api/save-textgrid)
     ├── public/               — place your .wav and .TextGrid here (also ipa_keys.json, the virtual IPA keyboard's key set)
     └── src/
-        ├── App.jsx           — main application: state, canvas drawing, interaction
-        ├── parseTextGrid.js  — Praat TextGrid parser + serializer
+        ├── App.jsx           — main application: state, canvas drawing, interaction, TextGrid serializer
+        ├── parseTextGrid.js  — Praat TextGrid parser
         ├── dsp.js            — DSP helpers used on the main thread (mel spectrogram, LPC formants, colormaps)
         ├── specWorker.js     — Web Worker: base mel spectrogram computed once on load
         ├── mfaWorker.js      — Web Worker: encodes audio + talks to mfa_server.py for in-browser re-alignment

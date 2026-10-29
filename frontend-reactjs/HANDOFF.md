@@ -421,7 +421,7 @@ so it should persist across loads within a session.
 
 ## Edit Mode
 
-**Edit mode is on by default on load** (`useState(true)` / `useRef(true)`). Toggled by the `1` **keyboard shortcut**, or by clicking the lock icon that appears next to the **GSA** logo once locked (added 2026-08-19 — see [Lock icon / toolbar indicator](#lock-icon--toolbar-indicator-2026-08-19) below).
+**Edit mode is on by default on load** (`useState(true)` / `useRef(true)`). Toggled by the `1` **keyboard shortcut**, or by clicking the lock icon that appears next to the **lysn** logo once locked (added 2026-08-19 — see [Lock icon / toolbar indicator](#lock-icon--toolbar-indicator-2026-08-19) below).
 
 ### Split Edit Button (removed)
 
@@ -434,7 +434,7 @@ The hotkey is now **hardcoded to** `1` in the keydown handler (no longer configu
 ### Lock icon / toolbar indicator (2026-08-19)
 
 Closes Todos #8 ("Give edit mode a visible on/off indicator"). A small padlock icon
-button now appears next to the **GSA** logo in the toolbar, but **only while locked**
+button now appears next to the **lysn** logo in the toolbar, but **only while locked**
 (`{!editMode && (...)}`) — mirroring how `.save-indicator` only renders when there's
 something to report, rather than a persistent always-on badge. The default
 (unlocked/editable) toolbar is therefore unchanged from before; the icon only shows up
@@ -1296,7 +1296,7 @@ if (isWord) {
 | Space                            | Play / pause                                                                                                                                                                                                                                                                                                           |
 | L                                | Toggle loop                                                                                                                                                                                                                                                                                                            |
 | R                                | Force-refresh spectrogram for the current view (same as the ↻ Force Refresh button)                                                                                                                                                                                                                                    |
-| `1`                              | Toggle lock / view-only mode (unlocked & editable by default; also toggleable via the lock icon next to the GSA logo once locked — see [Lock icon / toolbar indicator](#lock-icon--toolbar-indicator-2026-08-19); the hotkey itself is not rebindable — see [Split Edit Button (removed)](#split-edit-button-removed)) |
+| `1`                              | Toggle lock / view-only mode (unlocked & editable by default; also toggleable via the lock icon next to the lysn logo once locked — see [Lock icon / toolbar indicator](#lock-icon--toolbar-indicator-2026-08-19); the hotkey itself is not rebindable — see [Split Edit Button (removed)](#split-edit-button-removed)) |
 | Ctrl/Cmd+S                       | Save TextGrid to `public/` (dev only)                                                                                                                                                                                                                                                                                  |
 | Ctrl/Cmd+Z                       | Undo                                                                                                                                                                                                                                                                                                                   |
 | Ctrl/Cmd+Y                       | Redo                                                                                                                                                                                                                                                                                                                   |
@@ -1314,7 +1314,7 @@ if (isWord) {
 
 The edit mode hotkey is hardcoded to `1` in the keydown handler. The check matches `e.code`, `e.key`, and the `Numpad1` alias so numpad `1` works regardless of NumLock state.
 
-> These shortcuts are also surfaced in-app via `ShortcutsPopover` — a non-blocking fold-out panel (opened by clicking the **GSA** logo in the toolbar; no backdrop, so the timeline/tiers stay clickable while it's open). `USAGE.md`'s [quick-reference table](../USAGE.md#keyboard-shortcuts--quick-reference) mirrors this table for end users — keep all three in sync with the keydown handler in `App.jsx`.
+> These shortcuts are also surfaced in-app via `ShortcutsPopover` — a non-blocking fold-out panel (opened by clicking the **lysn** logo in the toolbar; no backdrop, so the timeline/tiers stay clickable while it's open). `USAGE.md`'s [quick-reference table](../USAGE.md#keyboard-shortcuts--quick-reference) mirrors this table for end users — keep all three in sync with the keydown handler in `App.jsx`.
 
 
 
@@ -1362,7 +1362,7 @@ Notable component classes:
 | `.save-indicator--saving/saved/error`            | Blue/green/red state variants                                                                                                                                                                             |
 | `.ctx-menu` / `__item` / `__sep`                 | Tier right-click context menu (built via `document.createElement`, see Theming below)                                                                                                                     |
 | `.popover-panel`                                 | Shared shell for `ExportPopover`/`TierNamePopover` — right-anchored (`right: 0`) since both toggle buttons sit on the right side of the toolbar                                                           |
-| `.shortcuts-popover-panel`                       | `ShortcutsPopover`'s shell — left-anchored (`left: 0`) variant of `.popover-panel`, since the GSA logo sits on the left; no backdrop, so it doesn't block interaction with the rest of the app while open |
+| `.shortcuts-popover-panel`                       | `ShortcutsPopover`'s shell — left-anchored (`left: 0`) variant of `.popover-panel`, since the lysn logo sits on the left; no backdrop, so it doesn't block interaction with the rest of the app while open |
 | `.modal-backdrop` / `.modal-card`                | Shared shell for `FilePicker` and the MFA word-picker modal                                                                                                                                               |
 | `.toast` / `--error` / `--warn`                  | Fixed-position dismissable toasts (MFA error/OOV warning)                                                                                                                                                 |
 | `.mfa-queue-dropdown`                            | MFA queue-count dropdown panel                                                                                                                                                                            |
@@ -1408,7 +1408,7 @@ This pass is still visual-only. No toolbar actions, shortcuts, save/export/MFA/D
 
 This pass was intentionally **presentation-only**: no handlers, keyboard shortcuts, TextGrid logic, DSP requests, MFA queueing, save/export behavior, or data models changed. It moved the UI toward the provided audio-editor references by changing CSS and canvas draw styling:
 
-- Toolbar: increased the bar height/padding, made the GSA mark larger, made Play the one prominent circular control, gave the time display more room, softened flat toolbar button hover states, and kept action groups visually separated with `.toolbar-divider`.
+- Toolbar: increased the bar height/padding, made the lysn mark larger, made Play the one prominent circular control, gave the time display more room, softened flat toolbar button hover states, and kept action groups visually separated with `.toolbar-divider`.
 - Timeline layout: changed the default `.panels`/`.tiers` split from a spectrogram-dominant layout to `0.70` / `0.30`, made the minimap 40px tall (reduced from 50px on 2026-08-19), and made the ruler 28px tall.
 - Gutters: widened every gutter to 64px, relabeled the waveform gutter from `WV` to `WAV`, the spectrogram gutter to `SPEC`, and added `Words` / `Phonemes` subtitles under `WRD` / `PHN`.
 - Tier controls: replaced the tier-visibility bar's inline style block with `.tier-visibility-bar`, `.tier-visibility-title`, `.tier-visibility-label`, `.tier-text-size-controls`, and `.tier-visibility-spacer`.

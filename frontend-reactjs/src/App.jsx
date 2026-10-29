@@ -4069,7 +4069,7 @@ export default function App() {
         const hResp = await fetch(`${MFA_SERVER}/health`, { signal: AbortSignal.timeout(3000) });
         serverOk = hResp.ok;
       } catch(_) {}
-      if (!serverOk) throw new Error(`MFA server not reachable at ${MFA_SERVER}\nRun: cd code && python mfa_server.py`);
+      if (!serverOk) throw new Error(`MFA server not reachable at ${MFA_SERVER}\nRun (in the aligner conda env, from the repo root): python mfa_server.py`);
 
       const result = await new Promise((resolve, reject) => {
         const worker = new Worker(new URL('./mfaWorker.js', import.meta.url), { type: 'module' });
