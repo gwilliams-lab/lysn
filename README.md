@@ -1,9 +1,26 @@
 
-# lysn: your personal annotation tool
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="frontend-reactjs/public/icons/lysn_dark-mode.png">
+    <img src="frontend-reactjs/public/icons/lysn_light-mode.png" alt="lysn logo" width="140">
+  </picture>
+</p>
 
-Open-source software for speech transcription, alignment, and annotation.
+<h1 align="center">lysn</h1>
 
-**Website:** https://gwilliams-lab.github.io/annotation-tool/
+<p align="center">
+  Open-source software for speech transcription, alignment, and annotation.<br>
+  A browser-based viewer and editor for Praat TextGrid files, plus a first-pass ASR pipeline.
+</p>
+
+<p align="center">
+  <a href="https://gwilliams-lab.github.io/annotation-tool/">Website</a> ·
+  <a href="#initial-setup">Setup</a> ·
+  <a href="TRANSCRIPTION.md">Transcription</a> ·
+  <a href="USAGE.md">Usage</a> ·
+  <a href="ADVANCED.md">Advanced</a> ·
+  <a href="CONTRIBUTING.md">Contributing</a>
+</p>
 
 A browser-based audio annotation viewer and editor for Praat TextGrid files. This repository also contains code to perform a first-pass automatic speech transcription on an audio file of your choosing.
 
