@@ -14,25 +14,62 @@
     return a;
   }
 
-  const workflowLink = document.createElement('a');
-  workflowLink.href = '#workflow';
-  workflowLink.textContent = data.nav.workflow;
-  navLinks.append(workflowLink, externalLink(data.github, data.nav.github));
+  if (data.nav.demo) {
+    const demoLink = document.createElement('a');
+    demoLink.href = '#demo';
+    demoLink.textContent = data.nav.demo;
+    navLinks.append(demoLink);
+  }
+
+  if (data.nav.faq) {
+    const faqLink = document.createElement('a');
+    faqLink.href = '#faq';
+    faqLink.textContent = data.nav.faq;
+    navLinks.append(faqLink);
+  }
+
+  const navGithub = externalLink(data.github, data.nav.github);
+  navGithub.className = 'nav-cta';
+  navLinks.append(navGithub);
 
   if (data.hero.eyebrow) {
     document.getElementById('eyebrow-text').textContent = data.hero.eyebrow;
   } else {
-    document.querySelector('.eyebrow').hidden = true;
+    const eyebrow = document.querySelector('.eyebrow');
+    if (eyebrow) eyebrow.remove();
   }
   document.getElementById('hero-title').innerHTML = data.hero.titleHtml;
   document.getElementById('dek').innerHTML = data.hero.dekHtml;
 
+  const heroActions = document.getElementById('hero-actions');
+  if (heroActions) {
+    if (data.hero.cta) {
+      const heroCta = externalLink(data.github, '');
+      heroCta.className = 'hero-cta';
+      heroCta.append(document.createTextNode(data.hero.cta.label + ' '));
+      const arrow = document.createElement('span');
+      arrow.textContent = '↗';
+      heroCta.append(arrow);
+      heroActions.append(heroCta);
+      if (data.hero.cta.sublabel) {
+        const note = document.createElement('span');
+        note.className = 'hero-cta-note';
+        note.textContent = data.hero.cta.sublabel;
+        heroActions.append(note);
+      }
+    } else {
+      heroActions.hidden = true;
+    }
+  }
+
   const byline = document.getElementById('byline');
   if (data.byline && data.byline.length) {
-    data.byline.forEach((text) => {
-      const span = document.createElement('span');
-      span.textContent = text;
-      byline.append(span);
+    data.byline.forEach((item) => {
+      const text = typeof item === 'string' ? item : item.text;
+      const href = typeof item === 'string' ? null : item.href;
+      const node = href ? externalLink(href, text) : document.createElement('span');
+      if (!href) node.textContent = text;
+      byline.append(node);
     });
   } else {
     byline.hidden = true;
@@ -46,14 +83,15 @@
   }
 
   if (data.demo) story.append(renderSimpleDemo(data.demo));
-  (data.demos || []).forEach((demo, demoIndex) => story.append(renderDemo(demo, demoIndex)));
+  (data.demos || []).forEach((demo, demoIndex) => {
+    const figure = renderDemo(demo, demoIndex);
+    if (demoIndex === 0) figure.id = 'demo';
+    story.append(figure);
+  });
 
-  if (data.introTitle) {
-    const h2 = document.createElement('h2');
-    h2.textContent = data.introTitle;
-    story.append(h2);
-  }
-  data.intro.forEach((item) => story.append(paragraph(item.html, item.id)));
+  // Definitions primer: keep the vocabulary near the top so Features and the
+  // positioning sections below can reference it.
+  if (data.definitionsIntro) story.append(paragraph(data.definitionsIntro));
 
   const definitions = document.createElement('div');
   definitions.className = 'definitions';
@@ -69,8 +107,6 @@
   });
   story.append(definitions);
 
-  if (data.bridge) story.append(paragraph(data.bridge.html, data.bridge.id));
-
   if (data.features) story.append(renderFeatures(data.features));
 
   (data.sections || []).forEach((section) => {
@@ -80,6 +116,15 @@
     (section.paragraphs || []).forEach((html) => story.append(paragraph(html)));
     if (section.placeholder) story.append(renderPlaceholder(section.placeholder));
   });
+
+  // Motivations / rationale move below the product story.
+  if (data.introTitle) {
+    const h2 = document.createElement('h2');
+    h2.textContent = data.introTitle;
+    story.append(h2);
+  }
+  data.intro.forEach((item) => story.append(paragraph(item.html, item.id)));
+  if (data.bridge) story.append(paragraph(data.bridge.html, data.bridge.id));
 
   if (data.faq) story.append(renderFaq(data.faq));
   if (data.contribute) story.append(renderProse(data.contribute));
@@ -102,6 +147,9 @@
     cta.append(arrow);
     story.append(cta);
   }
+
+  // if (data.cite) story.append(renderProse(data.cite));
+  if (data.contributors) story.append(renderProse(data.contributors));
 
   if (data.ack) story.append(renderProse(data.ack));
   if (data.ai) story.append(renderProse(data.ai, 'ai'));
@@ -185,6 +233,7 @@
   function renderFaq(faq) {
     const wrap = document.createElement('div');
     wrap.className = 'faq';
+    wrap.id = 'faq';
     const h2 = document.createElement('h2');
     h2.textContent = faq.title;
     wrap.append(h2);

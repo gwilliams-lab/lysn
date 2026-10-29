@@ -16,19 +16,20 @@ window.LYSN = {
   },
 
   nav: {
-    workflow: 'The workflow',
+    demo: 'Demo',
+    faq: 'FAQ',
     github: 'GitHub ↗',
   },
 
   hero: {
-    eyebrow: 'Introducing lysn · Open-source speech annotation',
-    titleHtml: 'Generate, correct,<br>and export <em>speech<br>annotations.</em>',
+    eyebrow: '', // Introducing lysn · Open-source speech annotation
+    titleHtml: 'Generate, correct, and export <br> <em>speech annotations.<br></em>',
     dekHtml: '<code>lysn</code> is an open-source platform for generating, inspecting, and correcting speech annotations. It combines automatic transcription and alignment with a browser-based editor for annotations in standard TextGrid formats.',
+    cta: { label: 'Get started on GitHub', sublabel: 'Clone the repo and follow the setup guide to run lysn locally.' },
   },
 
   byline: [
-    'Gwilliams Laboratory of Speech Neuroscience',
-    'Project introduction',
+    { text: 'Gwilliams Laboratory of Speech Neuroscience', href: 'https://gwilliamslab.stanford.edu' },
   ],
 
   demos: [
@@ -71,12 +72,9 @@ window.LYSN = {
     {
       html: 'Speech and language researchers increasingly use natural, continuous speech to study language processing (<a href="https://pubmed.ncbi.nlm.nih.gov/32656294/" target="_blank" rel="noopener">Hamilton &amp; Huth, 2018</a>). Recordings such as conversations, podcasts, and audiobooks often require annotations before researchers can use them in their analyses.',
     },
-    {
-      id: 'workflow',
-      html: 'Producing speech annotation can involve several distinct tasks:',
-    },
   ],
 
+  definitionsIntro: 'Producing speech annotation can involve several distinct tasks:',
   definitions: [
     {
       term: 'Word Transcription',
@@ -129,7 +127,6 @@ window.LYSN = {
       titleHtml: 'Where lysn fits',
       paragraphs: [
         '<code>lysn</code> builds on existing speech annotation tools and community conventions, including the WhisperX automatic recognition system (<a href="https://arxiv.org/abs/2303.00747" target="_blank" rel="noopener">Bain et. al, 2023</a>), the Montreal Forced Aligner (<a href="https://arxiv.org/abs/2606.18466" target="_blank" rel="noopener">McAuliffe et, al. 2026</a>), and the <a href="https://www.fon.hum.uva.nl/praat/manual/TextGrid.html" target="_blank" rel="noopener">Praat TextGrid format</a>. We additionally took inspiration from the <a href="https://www.audacityteam.org/" target="_blank" rel="noopener">Audacity</a> graphical interface. Our ultimate focus with <code>lysn</code> is a workflow that links cutting-edge automatic annotation tools to interactive review and correction, while supporting users with different levels of annotation experience.',
-        '<br> Explore the code and getting-started instructions in the <a href="https://github.com/gwilliams-lab/lysn" target="_blank" rel="noopener">GitHub repository</a>.',
       ],
     },
   ],
@@ -174,9 +171,24 @@ window.LYSN = {
     ],
   },
 
+  contributors: {
+    title: 'Contributors',
+    paragraphs: [
+      '<code>lysn</code> was initially designed and developed by Ilina Bhaya-Grossman and Ali Sartaz Khan. Allison Lievano Gomez and Rishan Checker subsequently helped with testing and feature expansion. This work was carried out at the <a href="https://gwilliamslab.stanford.edu" target="_blank" rel="noopener">Gwilliams Laboratory of Speech Neuroscience</a>. '  
+    ],
+  },
+
+  cite: {
+    title: 'How to cite',
+    paragraphs: [
+      'If you use <code>lysn</code> in your research, please cite it as:',
+      'Author(s). (Year). <em>lysn: Open-source speech annotation.</em> https://github.com/gwilliams-lab/lysn',
+    ],
+  },
+
   ack: {
     title: 'Acknowledgments',
-    html: 'We thank members of the Gwilliams Laboratory of Speech Neuroscience for feedback throughout development, and Maya Inbar for detailed interface feedback and feature suggestions.',
+    html: 'We thank members of the Gwilliams Laboratory of Speech Neuroscience for feedback throughout development, particularly Jill Kries and Joyce Tang. We also thank Maya Inbar for detailed interface feedback and feature suggestions.',
   },
 
   ai: {
