@@ -174,7 +174,7 @@ window.LYSN = {
   contributors: {
     title: 'Contributors',
     paragraphs: [
-      '<code>lysn</code> was initially designed and developed by Ilina Bhaya-Grossman and Ali Sartaz Khan. Allison Lievano Gomez and Rishan Checker subsequently helped with testing and feature expansion. This work was carried out at the <a href="https://gwilliamslab.stanford.edu" target="_blank" rel="noopener">Gwilliams Laboratory of Speech Neuroscience</a>. '  
+      '<code>lysn</code> was initially designed and developed by Ilina Bhaya-Grossman and Ali Sartaz Khan. Allison Lievano Gomez and Rishan Checker subsequently helped with testing and feature expansion. This work was carried out in the <a href="https://gwilliamslab.stanford.edu" target="_blank" rel="noopener">Gwilliams Laboratory of Speech Neuroscience</a>. '  
     ],
   },
 
