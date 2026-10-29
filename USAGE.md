@@ -26,7 +26,7 @@ Open **http://localhost:5173** — the audio and TextGrid load automatically.
 
 **Multiple files:** if `public/` contains more than one `.wav` or `.TextGrid`, a picker modal appears on startup letting you choose which pair to open.
 
-You can also load files at any time without restarting — click **More ⋮** in the toolbar, then **Load TextGrid** or **Load Wav**, to swap in a new TextGrid or audio file. **Load Wav** works for a wav anywhere on disk, not just files already in `public/` — if the file you pick isn't already there, it's copied in automatically so the enhanced spectrogram works for it too; you'll be asked to confirm first if that would overwrite an existing file of the same name.
+You can also load files at any time without restarting: click **More ⋮** in the toolbar, then **Load TextGrid** or **Load Wav**, to swap in a new TextGrid or audio file. **Load Wav** works for a wav anywhere on disk, not just files already in `public/`. If the file you pick isn't already there, it's copied in automatically so the enhanced spectrogram works.
 
 <video src="https://github.com/user-attachments/assets/642f285d-c20b-4bd4-8114-e0bb2c3ec80d" controls width="100%"></video>
 
@@ -70,7 +70,7 @@ Use the **SHOW** checkbox bar at the top of the tier area to hide/show individua
 
 ### Confidence scores & edited words
 
-Words you create or manually change (by editing, moving, or resizing a tile, or via **Validate word** in the right-click menu) are marked as **edited** and highlighted in green on the tile, separate from the confidence-score color scale.
+Words you create or manually change (by editing, moving, or resizing a tile, or via **Validate word** in the right-click menu) are marked as **edited** and highlighted in teal on the tile, separate from the confidence-score color scale.
 
 Click **Scores** in the toolbar to open the confidence dashboard: stats (mean/median/min/max), a 10-bin histogram, a color legend, and the 5 lowest-confidence words. Click any word in that list to jump the playhead and view to it. Below the lowest-confidence list, an **Edited words** section lists every edited word, showing what it was before and what it was changed to (e.g. ~~teh~~ → the).
 
@@ -80,7 +80,7 @@ Edited status, and the before/after text, are saved into the `.TextGrid` file al
 
 Tiles are **editable by default**. Press **`1`**, or click the lock icon next to the **lysn** logo (it appears once locked), to switch into **locked / view-only mode** — editing, tile-editing shortcuts, and deletion are disabled until you unlock again.
 
-There's no persistent hint bar while unlocked — click the **lysn** logo in the toolbar at any time to open the full shortcuts reference.
+There's no persistent hint bar while unlocked. Click the **lysn** logo in the toolbar at any time to open the full shortcuts reference.
 
 **Single tile operations:**
 - **Click a tile** — exclusive select: replaces any previous selection with that one tile, moves the playhead to its onset, and sets the play region to onset→offset
