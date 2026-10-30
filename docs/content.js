@@ -74,7 +74,7 @@ window.LYSN = {
     },
   ],
 
-  definitionsIntro: 'Producing speech annotation can involve several distinct tasks:',
+  definitionsIntro: 'The workflow above touches on several distinct tasks that go into annotating speech. Before going further, it’s worth defining some terms:',
   definitions: [
     {
       term: 'Word Transcription',
@@ -164,7 +164,7 @@ window.LYSN = {
   },
 
   contribute: {
-    title: 'If you’d like to contribute',
+    title: 'If <em>you’d</em> like to contribute',
     paragraphs: [
       'Do you see a feature that you’d like to add to the <code>lysn</code> platform? Found a bug in the current repository? We hope that <code>lysn</code> becomes a community tool and we welcome your contributions!',
       'To contribute to the <code>lysn</code> repository, take a look at the <a href="https://github.com/gwilliams-lab/lysn/blob/main/CONTRIBUTING.md">Contributing</a> page as well as the <a href="https://github.com/gwilliams-lab/lysn/blob/main/CODE_OF_CONDUCT.md">Code of Conduct</a>. If you’d like to contact the original developers directly, reach out to ilinabg [at] stanford.edu',

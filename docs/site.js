@@ -127,6 +127,11 @@
   if (data.bridge) story.append(paragraph(data.bridge.html, data.bridge.id));
 
   if (data.faq) story.append(renderFaq(data.faq));
+
+  // if (data.cite) story.append(renderProse(data.cite));
+  if (data.contributors) story.append(renderProse(data.contributors));
+
+
   if (data.contribute) story.append(renderProse(data.contribute));
 
   if (data.note) {
@@ -148,8 +153,7 @@
     story.append(cta);
   }
 
-  // if (data.cite) story.append(renderProse(data.cite));
-  if (data.contributors) story.append(renderProse(data.contributors));
+
 
   if (data.ack) story.append(renderProse(data.ack));
   if (data.ai) story.append(renderProse(data.ai, 'ai'));
@@ -223,7 +227,7 @@
     const wrap = document.createElement('div');
     if (className) wrap.className = className;
     const h2 = document.createElement('h2');
-    h2.textContent = block.title;
+    h2.innerHTML = block.title;
     wrap.append(h2);
     if (block.html) wrap.append(paragraph(block.html));
     (block.paragraphs || []).forEach((html) => wrap.append(paragraph(html)));

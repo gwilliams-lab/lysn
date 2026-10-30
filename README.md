@@ -43,9 +43,11 @@ What you should see once the tool is all set up:
 > [!NOTE]
 > The interface may look slightly different from this demo, but the functionality is the same; don't worry if your version doesn't match exactly.
 
-<a href="https://www.youtube.com/watch?v=itkZ2tmGEx8">
-  <img src="https://img.youtube.com/vi/itkZ2tmGEx8/maxresdefault.jpg" width="600">
-</a>
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=itkZ2tmGEx8">
+    <img src="https://img.youtube.com/vi/itkZ2tmGEx8/maxresdefault.jpg" width="600">
+  </a>
+</p>
 
 ---
 
