@@ -128,11 +128,7 @@
 
   if (data.faq) story.append(renderFaq(data.faq));
 
-  // if (data.cite) story.append(renderProse(data.cite));
   if (data.contributors) story.append(renderProse(data.contributors));
-
-
-  if (data.contribute) story.append(renderProse(data.contribute));
 
   if (data.note) {
     const note = document.createElement('div');
@@ -154,6 +150,17 @@
   }
 
 
+
+  if (data.release) {
+    const note = document.createElement('div');
+    note.className = 'note';
+    const h3 = document.createElement('h3');
+    h3.textContent = data.release.title;
+    note.append(h3, paragraph(data.release.html));
+    story.append(note);
+  }
+
+  if (data.cite) story.append(renderProse(data.cite, 'cite'));
 
   if (data.ack) story.append(renderProse(data.ack));
   if (data.ai) story.append(renderProse(data.ai, 'ai'));
@@ -231,7 +238,32 @@
     wrap.append(h2);
     if (block.html) wrap.append(paragraph(block.html));
     (block.paragraphs || []).forEach((html) => wrap.append(paragraph(html)));
+    if (block.bibtex) wrap.append(renderBibtex(block.bibtex));
     return wrap;
+  }
+
+  function renderBibtex(bibtex) {
+    const box = document.createElement('div');
+    box.className = 'bibtex';
+    const bar = document.createElement('div');
+    bar.className = 'bibtex-bar';
+    const label = document.createElement('span');
+    label.textContent = 'BibTeX';
+    const copy = document.createElement('button');
+    copy.type = 'button';
+    copy.className = 'bibtex-copy';
+    copy.textContent = 'Copy';
+    copy.addEventListener('click', () => {
+      navigator.clipboard.writeText(bibtex).then(() => {
+        copy.textContent = 'Copied';
+        setTimeout(() => { copy.textContent = 'Copy'; }, 1500);
+      }).catch(() => {});
+    });
+    bar.append(label, copy);
+    const pre = document.createElement('pre');
+    pre.textContent = bibtex;
+    box.append(bar, pre);
+    return box;
   }
 
   function renderFaq(faq) {

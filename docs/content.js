@@ -163,27 +163,34 @@ window.LYSN = {
     ],
   },
 
-  contribute: {
-    title: 'If <em>you’d</em> like to contribute',
+  contributors: {
+    title: 'Contributors',
     paragraphs: [
+      '<code>lysn</code> was initially designed and developed by Ilina Bhaya-Grossman and Ali Sartaz Khan. Allison Lievano Gomez and Rishan Checker subsequently helped with testing and feature expansion. This work was carried out in the <a href="https://gwilliamslab.stanford.edu" target="_blank" rel="noopener">Gwilliams Laboratory of Speech Neuroscience</a>.',
       'Do you see a feature that you’d like to add to the <code>lysn</code> platform? Found a bug in the current repository? We hope that <code>lysn</code> becomes a community tool and we welcome your contributions!',
       'To contribute to the <code>lysn</code> repository, take a look at the <a href="https://github.com/gwilliams-lab/lysn/blob/main/CONTRIBUTING.md">Contributing</a> page as well as the <a href="https://github.com/gwilliams-lab/lysn/blob/main/CODE_OF_CONDUCT.md">Code of Conduct</a>. If you’d like to contact the original developers directly, reach out to ilinabg [at] stanford.edu',
     ],
   },
 
-  contributors: {
-    title: 'Contributors',
-    paragraphs: [
-      '<code>lysn</code> was initially designed and developed by Ilina Bhaya-Grossman and Ali Sartaz Khan. Allison Lievano Gomez and Rishan Checker subsequently helped with testing and feature expansion. This work was carried out in the <a href="https://gwilliamslab.stanford.edu" target="_blank" rel="noopener">Gwilliams Laboratory of Speech Neuroscience</a>. '  
-    ],
+  release: {
+    title: 'Release',
+    html: '<code>lysn</code> v0.1.0 is the first public release. See the <a href="https://github.com/gwilliams-lab/lysn/releases" target="_blank" rel="noopener">release notes</a> for highlights and known limitations, and please report issues on <a href="https://github.com/gwilliams-lab/lysn/issues" target="_blank" rel="noopener">GitHub</a>.',
   },
 
   cite: {
     title: 'How to cite',
     paragraphs: [
       'If you use <code>lysn</code> in your research, please cite it as:',
-      'Author(s). (Year). <em>lysn: Open-source speech annotation.</em> https://github.com/gwilliams-lab/lysn',
+      'Bhaya-Grossman, I., Khan, A. S., Lievano Gomez, A., Checker, R., &amp; Gwilliams, L. (2026). <em>lysn: Open-source speech annotation.</em> Zenodo. <a href="https://doi.org/10.5281/zenodo.23787330" target="_blank" rel="noopener">https://doi.org/10.5281/zenodo.23787330</a>',
     ],
+    bibtex: `@software{lysn2026,
+  author    = {Bhaya-Grossman, Ilina and Khan, Ali Sartaz and Lievano Gomez, Allison and Checker, Rishan and Gwilliams, Laura},
+  title     = {lysn: Open-source speech annotation},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.23787330},
+  url       = {https://doi.org/10.5281/zenodo.23787330}
+}`,
   },
 
   ack: {
