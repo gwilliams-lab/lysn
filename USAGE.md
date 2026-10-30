@@ -32,7 +32,7 @@ Open **http://localhost:5173** — the audio and TextGrid load automatically.
 
 You can also load files at any time without restarting: click **More ⋮** in the toolbar, then **Load TextGrid** or **Load Wav**, to swap in a new TextGrid or audio file. **Load Wav** works for a wav anywhere on disk, not just files already in `public/`. If the file you pick isn't already there, it's copied in automatically so the enhanced spectrogram works.
 
-<video src="https://github.com/user-attachments/assets/642f285d-c20b-4bd4-8114-e0bb2c3ec80d" controls width="100%"></video>
+<!-- <video src="https://github.com/user-attachments/assets/642f285d-c20b-4bd4-8114-e0bb2c3ec80d" controls width="100%"></video> -->
 
 > **Non-English audio:** MFA (used by both the initial ASR pipeline and the in-app MFA re-alignment button) defaults to English. See [Advanced features → In-browser MFA re-alignment](ADVANCED.md#in-browser-mfa-re-alignment) to point it at another language, or [Transcription → Non-English audio](TRANSCRIPTION.md#non-english-audio) for the initial pipeline.
 >
