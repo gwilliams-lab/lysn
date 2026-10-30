@@ -132,7 +132,7 @@ lysn is designed to run **locally in development mode** (`npm run dev`). A stati
 
 
 <!-- <video src="https://www.youtube.com/embed/itkZ2tmGEx8" controls width="100%"></video>
-<!-- <video src="https://github.com/user-attachments/assets/a6242a2a-df1b-4089-88d7-ecdb3a090055" controls width="100%"></video> --> -->
+<!-- <video src="https://github.com/user-attachments/assets/a6242a2a-df1b-4089-88d7-ecdb3a090055" controls width="100%"></video> -->
 
 ---
 
