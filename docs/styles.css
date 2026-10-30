@@ -248,15 +248,6 @@ figcaption {
 .faq p { margin: 0 0 12px; }
 .placeholder em { font-style: italic; }
 .ai p { font-size: 15px; line-height: 1.7; color: var(--muted); }
-.cite {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--accent);
-  border-radius: 12px;
-  padding: 24px 28px;
-  margin: 36px 0;
-}
-.cite h2 { margin-top: 0; }
 .bibtex {
   margin-top: 18px;
   border: 1px solid var(--line);
