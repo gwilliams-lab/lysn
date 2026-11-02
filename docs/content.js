@@ -149,9 +149,9 @@ window.LYSN = {
         ],
       },
       {
-        question: 'Does my audio stay on my computer?',
+        question: 'Does the audio get uploaded to an external server?',
         answers: [
-          'Yes, since the browser-based tool is run locally, all audio will stay on your computer.',
+          'No, the browser-based tools runs locally on your computer, so your audio is not uploaded to any external server.',
         ],
       },
       {
