@@ -77,7 +77,7 @@ Requirements:
 https://github.com/user-attachments/assets/cd1a1024-f75e-4e82-831d-2d5e86317f5b -->
 
 Setup:
-- From the `annotation-tool/` directory, run:
+- From the `lysn/` directory, run:
   ```bash
   bash setup.sh
   ```
@@ -141,7 +141,7 @@ lysn is designed to run **locally in development mode** (`npm run dev`). A stati
 <!-- ## File structure
 
 ```
-annotation-tool/
+lysn/
 ├── README.md
 ├── USAGE.md
 ├── TRANSCRIPTION.md
