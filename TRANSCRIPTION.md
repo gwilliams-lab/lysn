@@ -21,10 +21,10 @@ This handles everything — word and phoneme transcription and alignment.
 If you specify an output file name, the resulting TextGrid will be saved to `frontend-reactjs/public/[output_filename].TextGrid`, otherwise the default filename is `output_whisper.TextGrid`.
 
 --- 
-**Changing the Whisper model size** — by default WhisperX uses `tiny.en` (fast, less accurate). To use a larger model, edit line 32 of `asr/models/whisper_asr.py`:
+**Changing the Whisper model size** — by default WhisperX uses `large-v3-turbo` (accurate, slower on CPU). To use a smaller/faster model, edit the `_CHECKPOINT` line in `asr/models/whisper_asr.py`:
 
 ```python
-_CHECKPOINT = "tiny.en"   # change to e.g. "base.en", "small.en", "large-v3-turbo"
+_CHECKPOINT = "large-v3-turbo"   # change to e.g. "tiny.en", "base.en", "small.en"
 ```
 
 Larger models are more accurate but slower. See the [WhisperX docs](https://github.com/m-bain/whisperX) for all available checkpoints.

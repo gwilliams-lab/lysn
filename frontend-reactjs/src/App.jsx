@@ -495,7 +495,7 @@ function customTierLabel(name) {
 
 function serializeTextGrid(
   duration, wordItems, phoneItems, customTiers = [], praatCompat = false,
-  wordsTierName = 'words', phonesTierName = 'phones',
+  wordsTierName = 'words', phonesTierName = 'phones', progress = null,
 ) {
   const tierData = [
     { name: wordsTierName, items: wordItems },
@@ -509,6 +509,8 @@ function serializeTextGrid(
     '',
     'xmin = 0',
     `xmax = ${duration.toFixed(6)}`,
+    // lysn-only review bookmark — Full mode only (Praat would misread the extra number).
+    ...(progress != null && !praatCompat ? [`lysn_progress = ${progress.toFixed(6)}`] : []),
     'tiers? <exists>',
     `size = ${tierData.length}`,
     'item []:',
@@ -547,6 +549,35 @@ function serializeTextGrid(
   });
 
   return lines.join('\n');
+}
+
+// ── Review bookmark helpers ─────────────────────────────────────────────
+// End time of the furthest tile that is new or changed (t0/t1/text/edited) between
+// one commit's before and after item arrays, or null if nothing was added/changed.
+// Diffs only this one commit — never the whole tier's edited history — so moving the
+// bookmark back by hand isn't immediately undone by older edits further ahead.
+function furthestChangedEnd(prevItems, nextItems) {
+  const prevById = new Map(prevItems.map(it => [it.id, it]));
+  let max = null;
+  for (const it of nextItems) {
+    const p = prevById.get(it.id);
+    const changed = !p || p.t0 !== it.t0 || p.t1 !== it.t1 || p.text !== it.text || !!p.edited !== !!it.edited;
+    if (changed && (max == null || it.t1 > max)) max = it.t1;
+  }
+  return max;
+}
+
+// Review bookmark color — pink, chosen to stay clear of the score scale (red→yellow→green),
+// edited teal, default lavender, playhead blue, and the gold F0 line. Fixed in both themes.
+const BOOKMARK_RGB = [236, 72, 153]; // #ec4899
+
+// View window of width `span` that shows time t a quarter of the way in from the
+// left (so more of what's still to review is visible), clamped to [0, dur].
+const BOOKMARK_VIEW_LEAD = 0.25;
+function viewAroundTime(t, span, dur) {
+  const s = Math.min(span, dur);
+  const t0 = Math.max(0, Math.min(dur - s, t - s * BOOKMARK_VIEW_LEAD));
+  return { t0, t1: t0 + s };
 }
 
 
@@ -1288,6 +1319,13 @@ export default function App() {
   const wordsTierNameRef = useRef('words');
   const phonesTierNameRef = useRef('phones');
   const playbackRateRef = useRef(1);
+  // Review bookmark ("reviewed up to here", seconds | null). Saved in Full-format
+  // TextGrids as `lysn_progress`, auto-advanced by commitTierItems, set by hand with B,
+  // part of undo snapshots. Hidden/inert in view-only mode. See HANDOFF.md.
+  const [progress, setProgress] = useState(null);
+  const progressRef = useRef(null);
+  const [resumeToast, setResumeToast] = useState(null); // string | null — "Resumed at …" on load
+  const resumeToastTimerRef = useRef(null);
 
   const panelSplitRef  = useRef(0.25);
   const wavePanelRef   = useRef(null);
@@ -1380,7 +1418,12 @@ export default function App() {
   }, []);
 
   // ── Tier item commit (shared across edit interaction and commitLabel) ──
-  const commitTierItems = useCallback((tierId, updated) => {
+  // advanceProgress: false opts a commit out of auto-advancing the review bookmark
+  // (used by MFA re-align, whose async results shouldn't push it past what was reviewed).
+  const commitTierItems = useCallback((tierId, updated, { advanceProgress = true } = {}) => {
+    const prevItems = tierId === 'words' ? wordsRef.current
+                    : tierId === 'phones' ? phonesRef.current
+                    : customTiersRef.current.find(t => t.id === tierId)?.items || [];
     if (tierId === 'words') {
       const prevById = new Map(wordsRef.current.map(it => [it.id, it]));
       const marked = updated.map(it => {
@@ -1402,6 +1445,15 @@ export default function App() {
     } else {
       const ct = customTiersRef.current.map(t => t.id === tierId ? { ...t, items: updated } : t);
       customTiersRef.current = ct; setCustomTiers([...ct]);
+    }
+    // Review bookmark auto-advance: forward only, to the end of the furthest tile this
+    // commit added/changed. Every edit path calls pushUndo() before committing, so the
+    // pre-advance bookmark is already in the undo snapshot.
+    if (advanceProgress) {
+      const end = furthestChangedEnd(prevItems, updated);
+      if (end != null && (progressRef.current == null || end > progressRef.current)) {
+        progressRef.current = end; setProgress(end);
+      }
     }
   }, []);
 
@@ -1430,6 +1482,7 @@ export default function App() {
     customTiers: customTiersRef.current.map(t => ({ ...t, items: t.items.map(i => ({ ...i })) })),
     wordsTierName: wordsTierNameRef.current,
     phonesTierName: phonesTierNameRef.current,
+    progress: progressRef.current,
   }), []);
 
   // Restores refs + state from a snapshot (popUndo/popRedo differ only in which
@@ -1445,9 +1498,11 @@ export default function App() {
     setCustomTiers([...(snap.customTiers || [])]);
     setWordsTierName(wordsTierNameRef.current);
     setPhonesTierName(phonesTierNameRef.current);
+    progressRef.current = snap.progress ?? null;
+    setProgress(progressRef.current);
     const current = serializeTextGrid(
       durationRef.current, snap.words, snap.phones, snap.customTiers || [],
-      false, wordsTierNameRef.current, phonesTierNameRef.current,
+      false, wordsTierNameRef.current, phonesTierNameRef.current, progressRef.current,
     );
     setIsDirty(current !== savedTextGridRef.current);
   }, []);
@@ -1895,6 +1950,13 @@ export default function App() {
                     : wd.score != null ? scoreColor(wd.score, 0.55) : 'rgba(58,123,213,0.3)';
       ctx.fillRect((wd.t0 / DUR) * w, 3, Math.max(1, ((wd.t1 - wd.t0) / DUR) * w), h - 6);
     }
+    // Review bookmark: tint the reviewed span [0, progress] + edge line (edit mode only).
+    if (editModeRef.current && progressRef.current != null && DUR > 0) {
+      const bx = Math.min(w, (progressRef.current / DUR) * w);
+      ctx.fillStyle = `rgba(${BOOKMARK_RGB.join(',')},0.12)`; ctx.fillRect(0, 0, bx, h);
+      ctx.strokeStyle = `rgb(${BOOKMARK_RGB.join(',')})`; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(bx, 0); ctx.lineTo(bx, h); ctx.stroke();
+    }
     const vx0 = (t0 / DUR) * w, vx1 = (t1 / DUR) * w;
     ctx.fillStyle = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)'; ctx.fillRect(vx0, 0, vx1 - vx0, h);
     ctx.strokeStyle = isLight ? '#a6adba' : '#6f7784'; ctx.lineWidth = 1.2;
@@ -1939,6 +2001,24 @@ export default function App() {
     const ctx = ov.getContext('2d');
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, tw, th);
+
+    // Review bookmark — pink line + small bookmark-ribbon tab at the top. Drawn before
+    // the playhead (so the playhead sits on top) and before the playhead's own
+    // out-of-view early return. Hidden in view-only mode.
+    if (editModeRef.current && progressRef.current != null) {
+      const bx = GUTTER + tX(progressRef.current, tw - GUTTER);
+      if (bx >= GUTTER && bx <= tw) {
+        ctx.strokeStyle = `rgba(${BOOKMARK_RGB.join(',')},0.85)`; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(bx, 0); ctx.lineTo(bx, th); ctx.stroke();
+        const RW = 5, RH = 12; // ribbon half-width / height
+        ctx.fillStyle = `rgb(${BOOKMARK_RGB.join(',')})`;
+        ctx.beginPath();
+        ctx.moveTo(bx - RW, 0); ctx.lineTo(bx + RW, 0); ctx.lineTo(bx + RW, RH);
+        ctx.lineTo(bx, RH - 4); ctx.lineTo(bx - RW, RH);
+        ctx.closePath(); ctx.fill();
+      }
+    }
+
     const px = GUTTER + tX(playheadRef.current, tw - GUTTER);
     if (px < GUTTER || px > tw) return;
 
@@ -2488,6 +2568,8 @@ export default function App() {
       // carried over.
       wordsTierNameRef.current = 'words';   setWordsTierName('words');
       phonesTierNameRef.current = 'phones'; setPhonesTierName('phones');
+      // Review bookmark belongs to the tiers just cleared above.
+      progressRef.current = null; setProgress(null);
       // This ref must only ever point at the wav actually backing the current
       // AudioBuffer. loadPublicPair re-sets it right after this call resolves (for the
       // public/ auto-load path); for any other source (drag-and-drop, or the More menu's
@@ -2505,8 +2587,16 @@ export default function App() {
     audioBufferRef.current = buffer;
     durationRef.current = buffer.duration;
     setDuration(buffer.duration);
-    viewRef.current = { t0: 0, t1: Math.min(buffer.duration, 20) };
-    playheadRef.current = 0;
+    // Open at the review bookmark if the TextGrid loaded just before this (loadPublicPair
+    // order) had one; otherwise at the start.
+    const bm = progressRef.current;
+    if (bm != null && bm <= buffer.duration) {
+      viewRef.current = viewAroundTime(bm, 20, buffer.duration);
+      playheadRef.current = bm;
+    } else {
+      viewRef.current = { t0: 0, t1: Math.min(buffer.duration, 20) };
+      playheadRef.current = 0;
+    }
 
     const ch = buffer.getChannelData(0);
     const N = 4000, step = Math.floor(ch.length / N);
@@ -2542,7 +2632,7 @@ export default function App() {
   }, [redraw, stopAudio]);
 
   const loadTextGrid = useCallback((text) => {
-    const { duration: dur, tiers } = parseTextGrid(text);
+    const { duration: dur, tiers, progress: fileProgress } = parseTextGrid(text);
     const tierLower = Object.fromEntries(Object.entries(tiers).map(([k, v]) => [k.toLowerCase(), v]));
     // Preserve whichever exact-cased tier name loadTextGrid actually matched (e.g. a
     // file might use "Words" or "words") — this is what gets written back out on
@@ -2571,8 +2661,21 @@ export default function App() {
     customTiersRef.current = extraTiers;
     setCustomTiers([...extraTiers]);
 
-    viewRef.current = { t0: 0, t1: Math.min(dur, 20) };
-    savedTextGridRef.current = serializeTextGrid(dur, w, p, extraTiers, false, wordsKey || 'words', phonesKey || 'phones');
+    // Review bookmark: restore it and open the view there (loadAudio repeats this jump
+    // when it runs after us, since it resets the view for the new buffer).
+    const bm = fileProgress != null ? Math.max(0, Math.min(dur, fileProgress)) : null;
+    progressRef.current = bm; setProgress(bm);
+    if (bm != null) {
+      viewRef.current = viewAroundTime(bm, 20, dur);
+      playheadRef.current = bm;
+      selectionRef.current = null;
+      setResumeToast(`Resumed at ${fmtTime(bm)}`);
+      clearTimeout(resumeToastTimerRef.current);
+      resumeToastTimerRef.current = setTimeout(() => setResumeToast(null), 2500);
+    } else {
+      viewRef.current = { t0: 0, t1: Math.min(dur, 20) };
+    }
+    savedTextGridRef.current = serializeTextGrid(dur, w, p, extraTiers, false, wordsKey || 'words', phonesKey || 'phones', bm);
     setIsDirty(false);
     redraw();
   }, [redraw]);
@@ -2581,7 +2684,7 @@ export default function App() {
   const doExportTextGrid = useCallback((filename, praatCompat) => {
     const text = serializeTextGrid(
       durationRef.current, wordsRef.current, phonesRef.current, customTiersRef.current,
-      praatCompat, wordsTierNameRef.current, phonesTierNameRef.current,
+      praatCompat, wordsTierNameRef.current, phonesTierNameRef.current, progressRef.current,
     );
     const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -2597,7 +2700,7 @@ export default function App() {
     const filename = tgFileNameRef.current + '.TextGrid';
     const content  = serializeTextGrid(
       durationRef.current, wordsRef.current, phonesRef.current, customTiersRef.current,
-      false, wordsTierNameRef.current, phonesTierNameRef.current,
+      false, wordsTierNameRef.current, phonesTierNameRef.current, progressRef.current,
     );
     setSaveState('saving');
     try {
@@ -2761,6 +2864,32 @@ export default function App() {
     ro.observe(el);
     return () => { ro.disconnect(); if (raf) cancelAnimationFrame(raf); };
   }, [redraw]);
+  // ── Review bookmark actions (edit mode only — the bookmark is hidden in view-only) ──
+  // B: set the bookmark to the end of the current selection (a clicked tile or a
+  // dragged region — "reviewed through here"), else to the playhead. Can move it
+  // backward. Undoable; marks the file unsaved.
+  const setBookmarkHere = useCallback(() => {
+    if (!editModeRef.current || !audioBufferRef.current) return;
+    const sel = selectionRef.current;
+    const t = Math.max(0, Math.min(durationRef.current, sel ? sel.t1 : playheadRef.current));
+    if (progressRef.current != null && Math.abs(progressRef.current - t) < 1e-6) return;
+    pushUndo();
+    progressRef.current = t; setProgress(t);
+    redraw();
+  }, [pushUndo, redraw]);
+
+  // Shift+B / toolbar readout: move the view + playhead to the bookmark.
+  const jumpToBookmark = useCallback(() => {
+    if (!editModeRef.current || progressRef.current == null) return;
+    const bm = progressRef.current;
+    const { t0, t1 } = viewRef.current;
+    viewRef.current = viewAroundTime(bm, t1 - t0, durationRef.current);
+    playheadRef.current = bm;
+    selectionRef.current = null;
+    updateTimeDisplay();
+    redraw();
+  }, [updateTimeDisplay, redraw]);
+
   // Warn before closing/refreshing when there are unsaved changes
   useEffect(() => {
     const handler = (e) => {
@@ -2789,6 +2918,11 @@ export default function App() {
       if ((e.ctrlKey || e.metaKey) && e.code === 'KeyS') { e.preventDefault(); requestSave(); return; }
       if (e.code === 'KeyL') { const n = !loopModeRef.current; loopModeRef.current = n; setLoopMode(n); }
       if (e.code === 'KeyR' && !e.ctrlKey && !e.metaKey) { e.preventDefault(); calcSpecForView(); }
+      // Review bookmark: B sets it here, Shift+B jumps to it (both no-ops in view-only mode).
+      if (e.code === 'KeyB' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        if (e.shiftKey) jumpToBookmark(); else setBookmarkHere();
+      }
       // Lock/view-only toggle hotkey — hardcoded to '1'. Same effect as clicking the
       // lock icon in the toolbar (see toggleEditMode).
       if (e.code === 'Digit1' || e.key === '1' || (e.code === 'Numpad1' && e.key === '1')) {
@@ -2903,7 +3037,7 @@ export default function App() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [stopPlay, startPlay, redraw, popUndo, pushUndo, commitTierItems, clearSelection, requestSave, adjustYZoom, adjustFontScale, calcSpecForView, getAllTiers, syncSelectionState, toggleEditMode]);
+  }, [stopPlay, startPlay, redraw, popUndo, pushUndo, commitTierItems, clearSelection, requestSave, adjustYZoom, adjustFontScale, calcSpecForView, getAllTiers, syncSelectionState, toggleEditMode, setBookmarkHere, jumpToBookmark]);
 
   // ── Zoom ──────────────────────────────────────────────────────────────
 
@@ -4114,7 +4248,8 @@ export default function App() {
 
       pushUndo();
       const merged = applyMfaResult(result.phones, segT0, segT1);
-      commitTierItems('phones', merged);
+      // Async result — must not auto-advance the review bookmark past what was reviewed.
+      commitTierItems('phones', merged, { advanceProgress: false });
       redraw();
 
       updateQueue(q => q.filter(j => j.id !== next.id));
@@ -4433,6 +4568,19 @@ export default function App() {
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                   <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
+              </button>
+            )}
+            {editMode && progress != null && duration > 0 && (
+              <button
+                type="button"
+                className="progress-indicator"
+                onClick={jumpToBookmark}
+                title={`Reviewed up to ${fmtTime(progress)}. Click (or Shift+B) to jump there; B sets it.`}
+              >
+                <svg width="10" height="12" viewBox="0 0 10 12" aria-hidden="true">
+                  <path d="M0 0H10V12L5 8.5L0 12Z" fill="currentColor" />
+                </svg>
+                Reviewed {Math.min(100, Math.round((progress / duration) * 100))}%
               </button>
             )}
             {isDirty && !saveState && (
@@ -5004,6 +5152,16 @@ export default function App() {
         }}>
           <img src="/loop-alert.gif" alt="" style={{ height: 16, borderRadius: 3, flexShrink: 0 }} />
           <span>Looping selection…</span>
+        </div>
+      )}
+
+      {/* ── Review-bookmark resume toast (on loading a TextGrid with lysn_progress) ── */}
+      {resumeToast && !loopToast && (
+        <div className="toast toast--info" style={{
+          position: 'fixed', top: 16, left: '50%', transform: 'translateX(-50%)',
+          fontFamily: 'Inter,system-ui,sans-serif',
+        }}>
+          {resumeToast}
         </div>
       )}
 

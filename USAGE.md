@@ -80,6 +80,18 @@ Click **Scores** in the toolbar to open the confidence dashboard: stats (mean/me
 
 Edited status, and the before/after text, are saved into the `.TextGrid` file along with everything else — so the next time the file is loaded, the Edited words list and the green tile highlighting reappear exactly as they were.
 
+### Review bookmark
+
+lysn keeps one **review bookmark** per file: a marker for how far through the file you've checked, so you can pick up where you left off next time.
+
+- **It moves forward on its own** whenever you change a tile (create, retime, rename, merge, paste, or **Validate word**) past the bookmark. It never moves backward on its own, and edits behind it leave it where it is.
+- **Press `B`** to set it by hand: to the end of the selected tile ("reviewed through this word"), or to the playhead if nothing is selected. Use this to mark progress through words that were already correct. `B` can also move it backward.
+- **Press `Shift+B`**, or click **Reviewed N%** in the toolbar, to jump to it.
+- It shows as a pink line with a small flag across the timeline, and the minimap shades everything before it.
+- It is **undoable** (`Ctrl/Cmd+Z`), counts as an unsaved change, and is saved with `Ctrl/Cmd+S`. When you reopen the file, lysn jumps straight to it.
+- It's hidden and can't be changed in locked / view-only mode.
+- It's saved only in lysn's own format (Save, or **Full export**). **Praat compatible** exports leave it out, and MFA re-alignment results don't move it.
+
 ### Locking / view-only mode
 
 Tiles are **editable by default**. Press **`1`**, or click the lock icon next to the **lysn** logo (it appears once locked), to switch into **locked / view-only mode** — editing, tile-editing shortcuts, and deletion are disabled until you unlock again.
@@ -119,8 +131,8 @@ There's no persistent hint bar while unlocked. Click the **lysn** logo in the to
 
 Click **Export** to download the annotations as a file. Two format options:
 
-- **Full export** — includes all tiers (WRD + PHN + custom), confidence scores, and edited/validated-word metadata; best for reloading into lysn since nothing is lost
-- **Praat compatible** — the same tiers (WRD + PHN + custom), but with confidence-score and edited/validated metadata fields omitted so Praat opens the file without warnings
+- **Full export** — includes all tiers (WRD + PHN + custom), confidence scores, edited/validated-word metadata, and the review bookmark; best for reloading into lysn since nothing is lost
+- **Praat compatible** — the same tiers (WRD + PHN + custom), but with confidence-score, edited/validated metadata, and review-bookmark fields omitted so Praat opens the file without warnings
 
 ---
 
@@ -133,6 +145,8 @@ Click **Export** to download the annotations as a file. Two format options:
 | `R` | Force-refresh the spectrogram for the current view |
 | `1` | Toggle lock / view-only mode (unlocked & editable by default) |
 | `Ctrl/Cmd+S` | Save TextGrid to disk (dev only) |
+| `B` | Set the review bookmark to the end of the selected tile, or to the playhead (when unlocked) |
+| `Shift+B` | Jump to the review bookmark (when unlocked) |
 | `Ctrl/Cmd+Z` | Undo |
 | `Ctrl/Cmd+Y` | Redo |
 | `Ctrl/Cmd+C` | Copy selected tile(s), including a group across tiers (when unlocked, requires a selection) |

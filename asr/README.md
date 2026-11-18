@@ -105,10 +105,10 @@ conda run -n aligner python asr/transcribe.py \
 
 ### Changing the Whisper model size
 
-The default checkpoint is `tiny.en` (fast, less accurate). To use a more accurate model, edit line 32 of `asr/models/whisper_asr.py`:
+The default checkpoint is `large-v3-turbo` (accurate, slower on CPU). To use a smaller/faster model, edit the `_CHECKPOINT` line in `asr/models/whisper_asr.py`:
 
 ```python
-_CHECKPOINT = "tiny.en"   # change to e.g. "base.en", "small.en", "large-v3-turbo"
+_CHECKPOINT = "large-v3-turbo"   # change to e.g. "tiny.en", "base.en", "small.en"
 ```
 
 ### All flags

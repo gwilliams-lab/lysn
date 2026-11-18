@@ -41,6 +41,8 @@ export const TILE_EDITING_HINTS = [
   { keys: ['Ctrl/Cmd+C'], desc: 'Copy the selected tile(s) (edit mode only)' },
   { keys: ['Ctrl/Cmd+V'], desc: 'Paste the copied tile(s) as new tile(s) anchored at playhead (edit mode only)' },
   { keys: ['Delete'], desc: 'Delete the selected tile(s) (edit mode only)' },
+  { keys: ['B'], desc: 'Set the review bookmark to the end of the selected tile, or to the playhead. Also moves forward on its own as you edit tiles.' },
+  { keys: ['Shift+B'], desc: 'Jump to the review bookmark (same as clicking "Reviewed N%" in the toolbar)' },
   { keys: ['Double-click'], desc: 'On a tile: rename it (opens the label editor). On empty space: create a new tile there and open the label editor for it.' },
   { keys: ['Right-click'], desc: 'Open the context menu — rename, merge with next, delete, or mark a word validated' },
   { keys: ['Click+Drag'], desc: 'On empty space: set a loop selection region. On a tile edge: resize it. On a tile body: move it (or the whole selected group). Edge/body drags snap to nearby boundaries within 10px.' },

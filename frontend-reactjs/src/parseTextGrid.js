@@ -1,13 +1,19 @@
 export function parseTextGrid(text) {
   const lines = text.split(/\r?\n/);
   let duration = 70;
+  let durationFound = false;
+  // lysn-only review bookmark (seconds), written by serializeTextGrid in Full mode only.
+  let progress = null;
   const tiers = {};
   let i = 0;
 
-  // Find xmax at top level for duration
+  // Find top-level header fields: xmax (duration) and the optional lysn_progress line.
+  // Both are unindented, so they can't be confused with tier/interval-level xmax lines.
   for (let j = 0; j < Math.min(20, lines.length); j++) {
     const m = lines[j].match(/^xmax\s*=\s*([\d.]+)/);
-    if (m) { duration = parseFloat(m[1]); break; }
+    if (m && !durationFound) { duration = parseFloat(m[1]); durationFound = true; }
+    const pm = lines[j].match(/^lysn_progress\s*=\s*([\d.]+)/);
+    if (pm) progress = parseFloat(pm[1]);
   }
 
   // Parse tiers
@@ -58,5 +64,5 @@ export function parseTextGrid(text) {
     i++;
   }
 
-  return { duration, tiers };
+  return { duration, tiers, progress };
 }

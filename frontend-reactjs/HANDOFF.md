@@ -26,7 +26,7 @@ On startup the app scans `public/` via a Vite dev-server middleware (`/api/publi
 - **Multiple** `.wav` **or** `.TextGrid` **files** — a `FilePicker` modal appears; the user selects which pair to open.
 - **No** `.wav` — a setup error screen is shown.
 
-Drop your own files onto the page, or use the Load buttons in the toolbar to load files at any time.
+Use the Load TextGrid / Load Wav buttons in the toolbar's More menu to load files at any time (drag-and-drop was removed — see [Drag-and-drop removed entirely](#drag-and-drop-removed-entirely-2026-08-25)).
 
 IPA key layout is read from `public/ipa_keys.json` — a JSON object mapping IPA symbol strings to example-word strings (with `**bold**` markup for the key sound). This file is checked into `public/` and ships with the repo, so the virtual keyboard works out of the box; edit it directly to change the key set.
 
@@ -85,6 +85,7 @@ Every hot-path value has **both** a `useState` and a `useRef`. The state drives 
 | `playbackRate`    | `playbackRateRef`    | Playback speed multiplier                                                                  |
 | `envelopeVisible` | `envelopeVisibleRef` | Waveform peak-envelope overlay toggle (see [Envelope toggle](#envelope-toggle-2026-08-18)) |
 | `autoPlayTile`    | `autoPlayTileRef`    | AUTO-PLAY checkbox — play a tile immediately on click                                      |
+| `progress`        | `progressRef`        | Review bookmark time in seconds, or `null` (see [Review Bookmark](#review-bookmark-2026-11-17)) |
 
 
 **Rule:** always update both together — `ref.current = n; setState(n)`.
@@ -226,7 +227,7 @@ Use `commitTierItems` for every tier write operation — it's the single place a
 
 `parseTextGrid(text)` returns `{ duration, tiers }`. `loadTextGrid` lowercases keys before lookup, so `"Words"` / `"words"` / `"WORDS"` all work. Any tier that isn't `words` or `phones` becomes a custom tier.
 
-`serializeTextGrid(duration, wordItems, phoneItems, customTiers, praatCompat, wordsTierName, phonesTierName)` fills gaps with empty intervals for valid Praat output. Used by both the ↓ Export button and the Ctrl/Cmd+S save-to-disk path. `wordsTierName`/`phonesTierName` (added 2026-08-25, default `'words'`/`'phones'`) are the literal tier names written into the file — see [Tier role picker](#tier-role-picker-2026-08-25) for why these aren't always the literal defaults.
+`serializeTextGrid(duration, wordItems, phoneItems, customTiers, praatCompat, wordsTierName, phonesTierName, progress)` fills gaps with empty intervals for valid Praat output. Used by both the ↓ Export button and the Ctrl/Cmd+S save-to-disk path. `wordsTierName`/`phonesTierName` (added 2026-08-25, default `'words'`/`'phones'`) are the literal tier names written into the file — see [Tier role picker](#tier-role-picker-2026-08-25) for why these aren't always the literal defaults.
 
 The export dialog offers two modes — both include **all tiers** (words, phones, and all custom tiers):
 
@@ -638,7 +639,7 @@ Pasted `t0`/`t1` are clamped to `[0, DUR]` — pasting near the end of the file 
 
 ### Vite middleware (`vite.config.js`)
 
-Three dev-only endpoints are registered:
+Four dev-only endpoints are registered:
 
 
 | Endpoint             | Method | Purpose                                                                                                                |
@@ -646,6 +647,7 @@ Three dev-only endpoints are registered:
 | `/api/public-files`  | GET    | Lists `*.wav` and `*.TextGrid` files in `public/` for auto-load                                                        |
 | `/api/save-textgrid` | POST   | Writes serialized TextGrid to `public/<filename>.TextGrid`                                                             |
 | `/api/compute-dsp`   | POST   | Talks to a persistent `dsp_server.py --serve` worker for spectrogram (linear STFT, mel-warped display axis) + formants |
+| `/api/upload-wav`    | POST   | Writes raw wav bytes (`?filename=…`) into `public/` so non-public wavs get the enhanced spectrogram — see [Loading a wav from outside public/](#loading-a-wav-from-outside-public-2026-08-25) |
 
 
 
@@ -744,6 +746,22 @@ const savedTextGridRef       = useRef(null);  // serialized baseline after load 
 ---
 
 
+
+## Review Bookmark (2026-11-17)
+
+One "reviewed up to here" time per file, so an annotator can close a file and pick up where they left off. Dual state+ref: `progress`/`progressRef` (seconds, or `null` = never set).
+
+- **File format.** Full-format saves/exports write one unindented header line, `lysn_progress = <seconds>`, right after the top-level `xmax`. It's left out when `progress` is `null`, and always left out when `praatCompat` is true (Praat reads header values by position, so an extra number would corrupt the file). `parseTextGrid` reads it in the same first-20-lines header scan as `xmax` and returns it as `progress`. `serializeTextGrid` takes it as a new last param. Every call site must pass `progressRef.current` (or the snapshot's value): `loadTextGrid`'s saved baseline, `applySnapshot`'s dirty check, `saveTextGrid`, `doExportTextGrid`. If any one is missing, changing only the bookmark won't show as unsaved.
+- **Auto-advance** lives in `commitTierItems`. Before writing, it captures the tier's previous items. After writing, `furthestChangedEnd(prev, updated)` (module scope) returns the furthest `t1` among items that are new or whose `t0`/`t1`/`text`/`edited` changed. The bookmark moves to that point only if it's **further** than the current bookmark (forward only). It diffs only the one commit, never the tier's whole edited history. That's what lets a user press `B` to move the bookmark backward without older edits further ahead immediately pulling it forward again. Deletes don't advance it, since deleted items aren't in `updated`. `promoteTierToRole` bypasses `commitTierItems`, so role swaps don't advance it either.
+- **MFA opt-out.** `processNextMfaJob` calls `commitTierItems('phones', merged, { advanceProgress: false })`. MFA results arrive asynchronously from a queue and can land after the user moved the bookmark, so they must not push it past what was actually reviewed.
+- **Manual set: `setBookmarkHere()`** (`B` key). Sets the bookmark to `selectionRef.current.t1` (a plain-clicked tile or a dragged loop region, i.e. "reviewed through here"), else to `playheadRef.current`, clamped to the file length. It can move backward. Calls `pushUndo()` first, and is a no-op if the value wouldn't change (so it doesn't push an empty undo step or dirty the file).
+- **Jump: `jumpToBookmark()`** (`Shift+B`, or clicking the toolbar's `.progress-indicator` "Reviewed N%" button). Keeps the current view span, positions the bookmark 25% in from the left via `viewAroundTime()` (module scope, `BOOKMARK_VIEW_LEAD`), moves the playhead there, and clears `selectionRef` so Space plays from the bookmark.
+- **Undo.** `snapshotState`/`applySnapshot` carry `progress`. Every edit already calls `pushUndo()` before `commitTierItems`, so undoing an edit also undoes the auto-advance it caused, with no extra code.
+- **On load**, `loadTextGrid` restores the bookmark (clamped to the TextGrid's duration), sets the view around it plus the playhead, and shows a 2.5s `resumeToast` ("Resumed at …"). `loadPublicPair` calls `loadTextGrid` *before* `loadAudio`, and `loadAudio` resets the view for the new buffer, so `loadAudio` repeats the jump when `progressRef` is set. When replacing an already-loaded file, `loadAudio`'s per-file reset block clears `progress` along with `words`/`phones`.
+- **View-only mode**: `B`/`Shift+B` are no-ops, and the bookmark line (`drawOverlay`), minimap shading (`drawMinimap`), and toolbar readout are all hidden (each checks `editModeRef`/`editMode`). `toggleEditMode` already calls `redraw()`, so the canvas parts appear and disappear immediately. The jump on load still happens in view-only mode, since it only moves the view.
+- **Rendering.** `drawOverlay` draws a pink 1.5px line plus a small ribbon tab at the top, *before* the playhead (so the playhead paints on top) and before the playhead's own out-of-view early return. `drawMinimap` tints `[0, progress]` and draws an edge line. The color is `BOOKMARK_RGB` (`#ec4899`, module scope in `App.jsx`), fixed in both themes. It was amber at first, but that read too close to the mid (yellow) end of the confidence-score scale. Pink avoids the score scale, edited teal, default lavender, playhead blue, and the gold F0 line. The DOM readout (`.progress-indicator` in `index.css`, a literal copy of that color, so keep them in sync) uses a darker pink (`#be185d`) in light mode for contrast.
+
+---
 
 ## IPA Virtual Keyboard
 
@@ -1295,6 +1313,7 @@ if (isWord) {
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Space                            | Play / pause                                                                                                                                                                                                                                                                                                           |
 | L                                | Toggle loop                                                                                                                                                                                                                                                                                                            |
+| B / Shift+B                      | Set the review bookmark (end of selection, else playhead) / jump to it — edit mode only; see [Review Bookmark](#review-bookmark-2026-11-17)                                                                                                                                                                         |
 | R                                | Force-refresh spectrogram for the current view (same as the ↻ Force Refresh button)                                                                                                                                                                                                                                    |
 | `1`                              | Toggle lock / view-only mode (unlocked & editable by default; also toggleable via the lock icon next to the lysn logo once locked — see [Lock icon / toolbar indicator](#lock-icon--toolbar-indicator-2026-08-19); the hotkey itself is not rebindable — see [Split Edit Button (removed)](#split-edit-button-removed)) |
 | Ctrl/Cmd+S                       | Save TextGrid to `public/` (dev only)                                                                                                                                                                                                                                                                                  |
@@ -1612,6 +1631,7 @@ This must stay in `index.html`, not move into a React effect — React can't run
 - **Play/Space always starts from** `sel.t0` **when a selection exists, or** `playheadRef.current` **when not.** `selectionRef` is set on tile click and cleared on empty-space click. The `to` endpoint is always `sel ? sel.t1 : duration` inside `startPlay`.
 - **Tile selection works in non-edit mode.** `addTierEditInteraction`'s `onMouseDown` hit-tests on every click, not just in edit mode. In non-edit mode a tile hit selects the tile and sets the play region, then returns — drag/rename/delete are gated inside the edit-mode branch.
 - `spectroRef.current` **may be** `null` **for long audio even after load.** Do not gate spectrogram rendering on `if (sp)` — the blit logic must check `spectroCacheRef` and `baseSpecCacheRef` independently so enhanced spec renders correctly without a base spec.
+- **Review bookmark auto-advance must diff a single commit** (`furthestChangedEnd(prev, updated)` in `commitTierItems`), never derive the bookmark from all `edited` words. The latter would keep re-advancing it after the user moves it back with `B`. Async writers (MFA) must pass `{ advanceProgress: false }`.
 - `loadPublicPair(wavName, tgName)` **is the shared load path** for both auto-load and `FilePicker`. Do not duplicate the fetch + `loadAudio` + `loadTextGrid` sequence elsewhere.
 
 
